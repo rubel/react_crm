@@ -1,38 +1,726 @@
-.App {
-  text-align: center;
+* {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  height: 100vh;
+  width: 100vw;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.main-container {
+  display: flex;
 }
-
-.App-header {
-  background-color: #282c34;
+main-container {
+  display: flex;
+}
+.container-fluid {
+  float: left;
+}
+main {
+  padding: 0px;
+  width: 100%;
   min-height: 100vh;
+}
+.title {
+  font-size: 20px;
+  display: grid;
+  place-items: center;
+  float: left;
+}
+.add-user-form {
+  width: 40%;
+  background-color: white;
+  min-height: 200px;
+  padding: 0px 0px 20px 0px;
+  float: left;
+}
+.add-user-perm {
+  width: 60%;
+  background-color: white;
+  min-height: 200px;
+  padding: 0px 0px 20px 20px;
+  float: right;
+}
+.form-custom-label {
+  padding-right: 20px;
+  font-size: 20px;
+}
+.permission-legend {
+  height: 40px;
+  background-color: rgb(234, 234, 234);
+  border-radius: 0px 20px 0px 0px;
+  padding: 0px;
+  text-align: right;
+  font-size: 20px;
+  margin-bottom: 46px;
+}
+.permission-legend2 {
+  height: 40px;
+  background-color: rgb(234, 234, 234);
+  padding: 0px;
+  text-align: right;
+  font-size: 20px;
+  margin-bottom: 46px;
+}
+.details-legend {
+  height: 40px;
+  background-color: rgb(234, 234, 234);
+  border-radius: 20px 0px 0px 0px;
+  padding: 0px 0px 0px 10px;
+  text-align: left;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+.details-legend2 {
+  height: 40px;
+  background-color: rgb(234, 234, 234);
+  padding: 0px 0px 0px 10px;
+  text-align: left;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+.permission-checkbox {
+  width: 50%;
+  padding: 0px 10px 6px 10px;
+  float: left;
+  font-size: 20px;
+}
+.top-bar {
+  width: 100%;
+  float: left;
+  height: 50px;
+  color: #97a8be;
+  text-align: right;
+  overflow: hidden;
+  position: relative;
+  background: #fff;
+  border-bottom: 1px solid #d8dce5;
+}
+.path {
+  float: left;
+  padding: 10px 0px 0px 25px;
+}
+.tabs {
+  height: 34px;
+  width: 100%;
+  float: left;
+  color: #97a8be;
+  margin-bottom: 10px;
+  overflow: hidden;
+  background: #fff;
+  border-bottom: 1px solid #d8dce5;
+  margin-bottom: 10px;
+}
+.tab {
+  float: left;
+  height: 34px;
+  background: white;
+  border-right: 1px solid gray;
+}
+.tab_text {
+  display: inline-block;
+  height: 100%;
+  line-height: 34px;
+  font-size: 14px;
+  font-weight: 400;
+  padding: 0 15px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: black;
+}
+
+.tab-icon {
+  display: inline-block;
+  height: 100%;
+  line-height: 34px;
+  font-size: 14px;
+  font-weight: 400;
+  padding: 0 0px 0px 15px;
+  cursor: pointer;
+  color: black;
+}
+
+.tabs .active {
+  background: rgb(240, 240, 240);
+  text-decoration: none;
+  display: block;
+  color: white;
+  padding: 0px;
+  transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+
+.bars {
+  width: 30px;
+  float: left;
+  padding: 13px 0px 0px 10px;
+}
+.topbar-right {
+  float: right;
+  padding: 10px 20px 0px 0px;
+}
+
+.sidebar {
+  color: white;
+  height: 100;
+  width: 240px;
+  overflow-y: auto;
+  background-color: #1e1e2d;
+  padding-bottom: 20%;
+}
+
+.top_section {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 10px;
+}
+
+.logo {
+  font-size: 22px;
+  line-height: 0px;
+}
+
+.hide {
+  display: none;
+}
+.routes {
+  margin-top: 15px;
   display: flex;
   flex-direction: column;
+  gap: 1px;
+  padding-left: 10px;
+}
+.icon {
+  display: block;
+  float: left;
+}
+.link {
+  display: flex;
+  color: white;
+  gap: 20px;
+  padding: 10px 10px;
+  transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+.link_text {
+  white-space: nowrap;
+  font-size: 18px;
+}
+
+.link:hover {
+  color: white;
+  border-right: 4px solid white;
+  background: rgb(45, 51, 89);
+  transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+.routes a {
+  text-decoration: none;
+  height: 46px;
+  color: white;
+}
+.routes a:hover {
+  color: white;
+  border-right: 4px solid white;
+  background: rgb(45, 51, 89);
+  transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+
+.active {
+  height: 46px;
+  text-decoration: none;
+  display: flex;
+  color: white;
+  gap: 20px;
+  padding: 10px 10px;
+  transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  background: rgb(45, 51, 89);
+  border-right: 4px solid white;
+}
+.menu {
+  display: flex;
+  color: white;
+  height: 46px;
+
+  padding: 5px 5px 5px 10px;
+  border-right: 4px solid transparent;
+  transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  justify-content: space-between;
+  cursor: pointer;
+}
+.menu_container .link {
+  padding-left: 20px;
+  border-bottom: rgb(0, 0, 0) 0.5px solid;
+  border-top: rgb(0, 0, 0) 0.5px solid;
+}
+.menu_container {
+  display: flex;
+  flex-direction: column;
+}
+.menu_item {
+  display: flex;
+  gap: 20px;
+}
+.fullShadow {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.2);
+}
+.productFormBg {
+  width: 1000px;
+  height: 400px;
+  background: white;
+  margin: 100px auto;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.warehouseFormBg {
+  width: 800px;
+  height: 400px;
+  background: white;
+  margin: 100px auto 0px auto;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.warehouseBlock {
+  width: 300px;
+  border: 1px solid gray;
+  border-radius: 8px;
+  height: 70px;
+  padding: 12px;
+  margin: 0px 20px 20px 0px;
+  float: left;
+}
+.warehouse_page_searchform {
+  height: 70px;
+}
+.warehouse_name_icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  color: white;
+  text-align: center;
+  padding: 6px auto 0px auto;
+  background: #2196f3;
+  float: left;
+  margin-right: 12px;
+  line-height: 30px;
+}
+.changeStatusFormBg {
+  width: 800px;
+  height: 380px;
+  background: white;
+  float: right;
+  margin: 100px auto 100px auto;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.xButton {
+  color: gray;
+  float: right;
+  cursor: pointer;
+  text-align: center;
+}
+.conformationStatusInOrderStatus {
+  width: 50%;
+  float: left;
+}
+.deliveryStatusInOrderStatus {
+  width: 50%;
+  float: right;
+}
+.historyBox {
+  width: 160px;
+  height: 60px;
+  padding: 5px 10px;
+  margin-bottom: 20px;
+  border: 2px ridge #97a8be;
+  border-radius: 10px;
+}
+.historyBox .bar {
+  width: 3px;
+  height: 21px;
+  position: absolute;
+  margin-top: 53px;
+  background: rgb(56, 56, 56);
+  margin-left: 65px;
+  width: 3px;
+  height: 20px;
+  position: absolute;
+}
+.assignOrderBg {
+  width: 620px;
+  height: 280px;
+  background: white;
+  float: right;
+  margin: 100px auto 100px auto;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.orderDetailsBg {
+  width: 530px;
+  height: auto;
+  background: white;
+  float: right;
+  margin: 80px auto auto auto;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.orderDetailsBg .customerDetails {
+  float: left;
+  width: 50%;
+  margin-bottom: 10px;
+}
+.orderDetailsBg .agentDetails {
+  float: right;
+  width: 50%;
+  margin-bottom: 10px;
+}
+.agentOrderSummery {
+  padding: 5px 7px;
+  margin: 10px 4px;
+  border-radius: 5px;
+  float: left;
+  font-size: 15px;
+}
+.orderDetailsBg .otherDetails {
+  margin-bottom: 10px;
+}
+
+.newProductForm {
+}
+.newCustomerForm {
+}
+.changeStatusForm {
+}
+.categoryFormBg {
+  width: 600px;
+  height: 250px;
+  background: white;
+  margin: auto;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.cityFormBg {
+  width: 600px;
+  height: 250px;
+  background: white;
+  margin: auto;
+  align-items: center;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.assignCityToDelivererBg {
+  width: 900px;
+  height: auto;
+  background: white;
+  margin: auto;
+  align-items: center;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.assignCityForm {
+  width: 100%;
+  float: right;
+}
+.customerFormBg {
+  width: 1000px;
+  height: 520px;
+  background: white;
+  float: right;
+  margin: 100px 100px 0px 0px;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.supplierFormBg {
+  width: 1000px;
+  height: 520px;
+  background: white;
+  float: right;
+  margin: 100px 100px 0px 0px;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.delivererFormBg {
+  width: 1000px;
+  height: 600px;
+  background: white;
+  float: right;
+  margin: 60px 100px 0px 0px;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.productSheetFormBg {
+  width: 1000px;
+  height: 650px;
+  background: white;
+  float: right;
+  margin: auto auto;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.shippingFormBg {
+  width: 1000px;
+  height: 380px;
+  background: white;
+  float: right;
+  margin: 60px 100px 0px 0px;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.deleteConformationBg {
+  width: 550px;
+  height: 180px;
+  background: white;
+  margin: auto;
+  align-items: center;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.deleteOrderConfirmBg {
+  width: 430px;
+  height: 160px;
+  background: white;
+  margin: auto;
+  align-items: center;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.agentProfilePage {
+  width: 90%;
+  height: 600px;
+  background: white;
+  margin: auto;
+  align-items: center;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.addOrderFormBg {
+  width: 90%;
+  height: auto;
+  background: white;
+  margin: auto;
+  align-items: center;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.addUserFormBg {
+  width: 90%;
+  height: 670px;
+  background: white;
+  margin: 30px auto;
+  align-items: center;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.form-custom-label {
+  font-size: 15px;
+}
+
+.form-control-lg {
+  font-size: 1rem;
+}
+.dottedMenuContainer {
+  position: absolute;
+  background: white;
+  width: 110px;
+  cursor: pointer;
+}
+.dottedMenuContainer_wide {
+  position: absolute;
+  background: white;
+  width: 128px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.dottedMenuContainerOrder {
+  position: absolute;
+  background: white;
+  width: 170px;
+  cursor: pointer;
+}
+.dottedMenuContainerOrderConformation {
+  position: absolute;
+  background: white;
+  width: 157px;
+  cursor: pointer;
+}
+.dottedMenu_itemtext {
+  display: block;
+  float: left;
+  padding-left: 20px;
+}
+.dottedMenu_item {
+  border: 1px solid gray;
+  padding: 4px 0px 4px 4px;
+  height: 34px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.main-container {
+  display: flex;
+}
+main {
+  padding: 10px;
+}
+
+.title {
+  font-size: 3rem;
+  display: grid;
+  place-items: center;
+}
+
+.sidebar {
+  background: rgb(0, 7, 61);
+  color: white;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.top_section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 10px;
+}
+.logo {
+  font-size: 18px;
+  line-height: 0;
+}
+.bars {
+  width: 30px;
+}
+.hide {
+  display: none;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  height: 30px;
+  padding: 10px;
+}
+.search input {
+  border: none;
+  margin-left: 10px;
+  border-radius: 5px;
+  background: rgb(238, 238, 238);
+
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.routes {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.link {
+  display: flex;
+  color: white;
+  gap: 10px;
+  padding: 5px 10px;
+  border-right: 4px solid transparent;
+  transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.active {
+  border-right: 4px solid white;
+  background: rgb(45, 51, 89);
 }
+.link_text {
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+.menu {
+  display: flex;
+  color: white;
+
+  padding: 5px 10px;
+  border-right: 4px solid transparent;
+  transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  justify-content: space-between;
+}
+.menu_item {
+  display: flex;
+  gap: 10px;
+}
+.menu_container {
+  display: flex;
+  flex-direction: column;
+}
+.menu_container .link {
+  padding-left: 20px;
+  border-bottom: #fff 0.5px solid;
+}
+*/
