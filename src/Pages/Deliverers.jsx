@@ -6,6 +6,7 @@ import AddedCityToDelivererRow from "../Components/AddedCityToDelivererRow";
 import CustomEditIcon from "../Components/CustomEditIcon";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
+import AccessDenied from "./AccessDenied";
 
 function Deliverers({ toggle, type }) {
   const [allDelivererList, setAllDelivererList] = useState([]);
@@ -360,581 +361,627 @@ function Deliverers({ toggle, type }) {
     getAllCities();
   }, [type]);
 
+  var loggedIn = sessionStorage.getItem("uid");
+
   return (
     <div>
-      <TopBar toggle={toggle} />
-      <Tabs />
-      <div className="container-fluid">
-        {/*....delete conformation.....*/}
-        <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
-          <div className="deleteConformationBg">
-            <div>
-              <h4>Warning</h4>
-            </div>
-            <div>Are you sure you want to delete this item?</div>
-            <div style={{ float: "right", width: "100%", padding: "18px 0px 10px 0px" }}>
-              <button
-                style={{ width: "40%" }}
-                className="btn btn-secondary btn-lg"
-                type="button"
-                onClick={() => {
-                  setDeleteConformationVisible(false);
-                }}>
-                Cancel
-              </button>
+      {loggedIn && (
+        <div>
+          <TopBar toggle={toggle} />
+          <Tabs />
+          <div className="container-fluid">
+            {/*....delete conformation.....*/}
+            <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
+              <div className="deleteConformationBg">
+                <div>
+                  <h4>Warning</h4>
+                </div>
+                <div>Are you sure you want to delete this item?</div>
+                <div style={{ float: "right", width: "100%", padding: "18px 0px 10px 0px" }}>
+                  <button
+                    style={{ width: "40%" }}
+                    className="btn btn-secondary btn-lg"
+                    type="button"
+                    onClick={() => {
+                      setDeleteConformationVisible(false);
+                    }}>
+                    Cancel
+                  </button>
 
-              <button
-                style={{ width: "40%", marginLeft: "30px" }}
-                className="btn btn-primary btn-lg"
-                type="submit"
-                onClick={deleteSelectedDeliverer}>
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/*....add city.....*/}
-        <div className="fullShadow" style={addCityFormVisible ? { display: "flex" } : { display: "none" }}>
-          <div className="cityFormBg">
-            <div style={{ padding: "0px 10px" }}>
-              <div style={{ marginBottom: "18px" }}>
-                <h2>Add new city</h2>
+                  <button
+                    style={{ width: "40%", marginLeft: "30px" }}
+                    className="btn btn-primary btn-lg"
+                    type="submit"
+                    onClick={deleteSelectedDeliverer}>
+                    Confirm
+                  </button>
+                </div>
               </div>
             </div>
-            <div>
-              <Formik
-                initialValues={{
-                  city: "",
-                }}
-                onSubmit={(values) => {
-                  addNewCity(values);
-                }}>
-                <Form>
-                  <div className="newCityForm">
-                    {/*................title......................*/}
 
-                    <div className="form-outline" style={{ padding: "0px 10px" }}>
-                      <label className="form-custom-label">Category Name</label>
-                      <Field type="text" name="city" placeholder="City" className="form-control form-control-lg" />
-                    </div>
-
-                    <div style={{ float: "right", width: "100%", padding: "12px 10px 3px 10px" }}>
-                      <button
-                        style={{ width: "40%" }}
-                        className="btn btn-secondary btn-lg"
-                        type="button"
-                        onClick={() => {
-                          setAddCityFormVisible(false);
-                          setAssignCityToDelivererFormVisible(true);
-                        }}>
-                        Cancel
-                      </button>
-
-                      <button
-                        style={{ width: "40%", marginLeft: "30px" }}
-                        className="btn btn-primary btn-lg"
-                        type="submit">
-                        Add City
-                      </button>
-                    </div>
+            {/*....add city.....*/}
+            <div className="fullShadow" style={addCityFormVisible ? { display: "flex" } : { display: "none" }}>
+              <div className="cityFormBg">
+                <div style={{ padding: "0px 10px" }}>
+                  <div style={{ marginBottom: "18px" }}>
+                    <h2>Add new city</h2>
                   </div>
-                </Form>
-              </Formik>
-            </div>
-          </div>
-        </div>
+                </div>
+                <div>
+                  <Formik
+                    initialValues={{
+                      city: "",
+                    }}
+                    onSubmit={(values) => {
+                      addNewCity(values);
+                    }}>
+                    <Form>
+                      <div className="newCityForm">
+                        {/*................title......................*/}
 
-        {/*....assign city form .....*/}
-        <div
-          className="fullShadow"
-          style={assignCityToDelivererFormVisible ? { display: "flex" } : { display: "none" }}>
-          <div className="assignCityToDelivererBg">
-            <div>
-              <div style={{ float: "left", width: "70%" }}>
-                <h4>Assign cities to delivery service</h4>
+                        <div className="form-outline" style={{ padding: "0px 10px" }}>
+                          <label className="form-custom-label">Category Name</label>
+                          <Field type="text" name="city" placeholder="City" className="form-control form-control-lg" />
+                        </div>
+
+                        <div style={{ float: "right", width: "100%", padding: "12px 10px 3px 10px" }}>
+                          <button
+                            style={{ width: "40%" }}
+                            className="btn btn-secondary btn-lg"
+                            type="button"
+                            onClick={() => {
+                              setAddCityFormVisible(false);
+                              setAssignCityToDelivererFormVisible(true);
+                            }}>
+                            Cancel
+                          </button>
+
+                          <button
+                            style={{ width: "40%", marginLeft: "30px" }}
+                            className="btn btn-primary btn-lg"
+                            type="submit">
+                            Add City
+                          </button>
+                        </div>
+                      </div>
+                    </Form>
+                  </Formik>
+                </div>
               </div>
-              <div style={{ float: "right", width: "30%", textAlign: "right" }}>
-                <button
-                  className="btn btn-primary btn-lg"
-                  type="button"
-                  style={{ marginRight: "6px" }}
-                  onClick={() => {
-                    addAllCitiesForSelectedDeliverer();
-                  }}>
-                  + All city
-                </button>
-                <button
-                  className="btn btn-primary btn-lg"
-                  type="button"
-                  onClick={() => {
-                    setAssignCityToDelivererFormVisible(false);
-                    setAddCityFormVisible(true);
-                  }}>
-                  + city
-                </button>
-              </div>
             </div>
-            <div>
-              <Formik
-                initialValues={{
-                  cities: [],
-                }}
-                onSubmit={() => {
-                  saveAddedCityValuesForDeliverers();
-                }}>
-                <Form>
-                  <div>
-                    <table className="table table-striped">
-                      <thead className="thead-dark">
-                        <tr>
-                          <th scope="col">City</th>
-                          <th scope="col">Delivery Cost</th>
-                          <th scope="col">Return Cost</th>
-                          <th scope="col" style={{ width: "13%", textAlign: "right" }}>
-                            <button
-                              type="button"
-                              className="btn btn-primary"
-                              onClick={() => {
-                                let allCities = cityDetailsForSelectedDeliverer.cities;
-                                let allDelCosts = cityDetailsForSelectedDeliverer.del_costs;
-                                let allReturnCosts = cityDetailsForSelectedDeliverer.return_costs;
 
-                                allCities.push("");
-                                allDelCosts.push(0);
-                                allReturnCosts.push(0);
-
-                                setCityDetailsForSelectedDeliverer({
-                                  cities: allCities,
-                                  del_costs: allDelCosts,
-                                  return_costs: allReturnCosts,
-                                });
-                              }}>
-                              +
-                            </button>
-                          </th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        {cityDetailsForSelectedDeliverer.cities &&
-                          cityDetailsForSelectedDeliverer.cities.map((c, index) => (
-                            <AddedCityToDelivererRow
-                              removeAddedCityForDeliverer={removeAddedCityForDeliverer}
-                              cityUpdatedForDeliverer={cityUpdatedForDeliverer}
-                              city={c}
-                              key={c + "_" + index}
-                              selectedCity={cityDetailsForSelectedDeliverer.cities[index]}
-                              index={index}
-                              delivery_cost={cityDetailsForSelectedDeliverer.del_costs[index]}
-                              return_cost={cityDetailsForSelectedDeliverer.return_costs[index]}
-                              allCities={allCities}
-                            />
-                          ))}
-                      </tbody>
-                    </table>
+            {/*....assign city form .....*/}
+            <div
+              className="fullShadow"
+              style={assignCityToDelivererFormVisible ? { display: "flex" } : { display: "none" }}>
+              <div className="assignCityToDelivererBg">
+                <div>
+                  <div style={{ float: "left", width: "70%" }}>
+                    <h4>Assign cities to delivery service</h4>
                   </div>
-
-                  <div style={{ textAlign: "center", marginTop: "12px" }}>
+                  <div style={{ float: "right", width: "30%", textAlign: "right" }}>
                     <button
-                      style={{ width: "20%" }}
-                      className="btn btn-secondary btn-lg"
+                      className="btn btn-primary btn-lg"
+                      type="button"
+                      style={{ marginRight: "6px" }}
+                      onClick={() => {
+                        addAllCitiesForSelectedDeliverer();
+                      }}>
+                      + All city
+                    </button>
+                    <button
+                      className="btn btn-primary btn-lg"
                       type="button"
                       onClick={() => {
                         setAssignCityToDelivererFormVisible(false);
+                        setAddCityFormVisible(true);
                       }}>
-                      Cancel
+                      + city
                     </button>
+                  </div>
+                </div>
+                <div>
+                  <Formik
+                    initialValues={{
+                      cities: [],
+                    }}
+                    onSubmit={() => {
+                      saveAddedCityValuesForDeliverers();
+                    }}>
+                    <Form>
+                      <div>
+                        <table className="table table-striped">
+                          <thead className="thead-dark">
+                            <tr>
+                              <th scope="col">City</th>
+                              <th scope="col">Delivery Cost</th>
+                              <th scope="col">Return Cost</th>
+                              <th scope="col" style={{ width: "13%", textAlign: "right" }}>
+                                <button
+                                  type="button"
+                                  className="btn btn-primary"
+                                  onClick={() => {
+                                    let allCities = cityDetailsForSelectedDeliverer.cities;
+                                    let allDelCosts = cityDetailsForSelectedDeliverer.del_costs;
+                                    let allReturnCosts = cityDetailsForSelectedDeliverer.return_costs;
 
+                                    allCities.push("");
+                                    allDelCosts.push(0);
+                                    allReturnCosts.push(0);
+
+                                    setCityDetailsForSelectedDeliverer({
+                                      cities: allCities,
+                                      del_costs: allDelCosts,
+                                      return_costs: allReturnCosts,
+                                    });
+                                  }}>
+                                  +
+                                </button>
+                              </th>
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            {cityDetailsForSelectedDeliverer.cities &&
+                              cityDetailsForSelectedDeliverer.cities.map((c, index) => (
+                                <AddedCityToDelivererRow
+                                  removeAddedCityForDeliverer={removeAddedCityForDeliverer}
+                                  cityUpdatedForDeliverer={cityUpdatedForDeliverer}
+                                  city={c}
+                                  key={c + "_" + index}
+                                  selectedCity={cityDetailsForSelectedDeliverer.cities[index]}
+                                  index={index}
+                                  delivery_cost={cityDetailsForSelectedDeliverer.del_costs[index]}
+                                  return_cost={cityDetailsForSelectedDeliverer.return_costs[index]}
+                                  allCities={allCities}
+                                />
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div style={{ textAlign: "center", marginTop: "12px" }}>
+                        <button
+                          style={{ width: "20%" }}
+                          className="btn btn-secondary btn-lg"
+                          type="button"
+                          onClick={() => {
+                            setAssignCityToDelivererFormVisible(false);
+                          }}>
+                          Cancel
+                        </button>
+
+                        <button
+                          style={{ width: "20%", marginLeft: "30px" }}
+                          className="btn btn-primary btn-lg"
+                          type="submit">
+                          Save
+                        </button>
+                      </div>
+                    </Form>
+                  </Formik>
+                </div>
+              </div>
+            </div>
+            {/*.......add Deliverer form here....... */}
+            <div className="fullShadow" style={addDelivererVisible ? { display: "block" } : { display: "none" }}>
+              <div className="delivererFormBg">
+                <div style={{ padding: "0px 10px" }}>
+                  <div>
+                    <h2>Create New Deliverer</h2>
+                  </div>
+                </div>
+                <div>
+                  <Formik
+                    initialValues={getAddDelivererInitialValues()}
+                    enableReinitialize
+                    onSubmit={(values) => {
+                      addEditDeliverer(values);
+                    }}>
+                    <Form>
+                      <div className="newDelivererForm">
+                        {/*................title......................*/}
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">
+                            {type == "company" ? "Company Name" : "Deliverer Name"}
+                          </label>
+                          <Field
+                            type="text"
+                            name="name"
+                            placeholder="Deliverer Name"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Login ID</label>
+                          <Field
+                            type="text"
+                            name="user_id"
+                            placeholder="Deliverer Name"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "25%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Country: </label>
+                          <Field
+                            as="select"
+                            name="country"
+                            className="select form-control-lg"
+                            style={{ width: "100%" }}>
+                            {allCountries &&
+                              allCountries.map((c, index) => (
+                                <option key={index} value={c.country}>
+                                  {c.country}
+                                </option>
+                              ))}
+                          </Field>
+                        </div>
+                        <div className="form-outline" style={{ width: "25%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">City</label>
+                          <Field as="select" name="city" className="select form-control-lg" style={{ width: "100%" }}>
+                            {allCities &&
+                              allCities.map((c, index) => (
+                                <option key={index} value={c.city}>
+                                  {c.city}
+                                </option>
+                              ))}
+                          </Field>
+                        </div>
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
+                          <label className="form-custom-label">e-Mail</label>
+                          <Field
+                            type="email"
+                            name="email"
+                            placeholder="email"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Phone</label>
+                          <Field
+                            type="text"
+                            name="phone"
+                            placeholder="Phone"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Whatsapp</label>
+                          <Field
+                            type="text"
+                            name="whatsapp"
+                            placeholder="WhatsApp"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Password</label>
+                          <Field
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Password Again</label>
+                          <Field
+                            type="password"
+                            name="password_again"
+                            placeholder="Password Again"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label" style={{ width: "100%" }}>
+                            Status
+                          </label>
+                          <div
+                            style={{
+                              border: "1px solid lightgray",
+                              borderRadius: "4px",
+                              minHeight: "42px",
+                              padding: "3px 12px",
+                            }}>
+                            <div style={{ float: "left", paddingTop: "4px" }}>Inactive</div>
+                            <div style={{ float: "left", margin: "0px 20px" }}>
+                              <label className="switch">
+                                <input type="checkbox" id="isActive" name="isActive" />
+                                <span className="slider round"></span>
+                              </label>
+                            </div>
+                            <div style={{ float: "left", paddingTop: "4px" }}>Active</div>
+                          </div>
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label" style={{ width: "100%" }}>
+                            Set shipping cost
+                          </label>
+                          <div
+                            style={{
+                              border: "1px solid lightgray",
+                              borderRadius: "4px",
+                              minHeight: "42px",
+                              padding: "3px 12px",
+                            }}>
+                            <div style={{ float: "left", paddingTop: "4px" }}>Manual</div>
+                            <div style={{ float: "left", margin: "0px 20px" }}>
+                              <label className="switch">
+                                <input type="checkbox" id="shippingAuto" name="shippingAuto" />
+                                <span className="slider round"></span>
+                              </label>
+                            </div>
+                            <div style={{ float: "left", paddingTop: "4px" }}>Automatic</div>
+                          </div>
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Default shipping cost (DH)</label>
+                          <Field
+                            type="number"
+                            name="defaultShippingCost"
+                            placeholder="0"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Stock Alert</label>
+                          <Field
+                            type="number"
+                            name="stockAlert"
+                            placeholder="0"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
+                          <button
+                            style={{ width: "20%" }}
+                            className="btn btn-secondary btn-lg"
+                            type="button"
+                            onClick={() => {
+                              setAddDelivererVisible(false);
+                            }}>
+                            Cancel
+                          </button>
+
+                          <button
+                            style={{ width: "20%", marginLeft: "30px" }}
+                            className="btn btn-primary btn-lg"
+                            type="submit">
+                            {selectedDelivererId > 0 ? "Edit Deliverer" : "Add Deliverer"}
+                          </button>
+                        </div>
+                      </div>
+                    </Form>
+                  </Formik>
+                </div>
+              </div>
+            </div>
+
+            {/*.......add shipping company form here....... */}
+            <div className="fullShadow" style={addShippingCompanyVisible ? { display: "block" } : { display: "none" }}>
+              <div className="shippingFormBg">
+                <div style={{ padding: "0px 10px" }}>
+                  <div>
+                    <h2>Create New Shipping Company</h2>
+                  </div>
+                </div>
+                <div>
+                  <Formik
+                    initialValues={getAddShippingCompanyInitialValues()}
+                    enableReinitialize
+                    onSubmit={(values) => {
+                      addEditShippingCompany(values);
+                    }}>
+                    <Form>
+                      <div className="newDelivererForm">
+                        {/*................title......................*/}
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Company Name</label>
+                          <Field
+                            type="text"
+                            name="name"
+                            placeholder="Company Name"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
+                          <label className="form-custom-label">e-Mail</label>
+                          <Field
+                            type="email"
+                            name="email"
+                            placeholder="email"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Phone</label>
+                          <Field
+                            type="text"
+                            name="phone"
+                            placeholder="Phone"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Whatsapp</label>
+                          <Field
+                            type="text"
+                            name="whatsapp"
+                            placeholder="WhatsApp"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Default shipping cost (DH)</label>
+                          <Field
+                            type="number"
+                            name="defaultShippingCost"
+                            placeholder="0"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Stock Alert</label>
+                          <Field
+                            type="number"
+                            name="stockAlert"
+                            placeholder="0"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
+                          <button
+                            style={{ width: "20%" }}
+                            className="btn btn-secondary btn-lg"
+                            type="button"
+                            onClick={() => {
+                              setAddShippingCompanyVisible(false);
+                            }}>
+                            Cancel
+                          </button>
+
+                          <button
+                            style={{ width: "20%", marginLeft: "30px" }}
+                            className="btn btn-primary btn-lg"
+                            type="submit">
+                            {selectedDelivererId > 0 ? "Edit Company" : "Add Company"}
+                          </button>
+                        </div>
+                      </div>
+                    </Form>
+                  </Formik>
+                </div>
+              </div>
+            </div>
+
+            {/* .......list all deliverers or companies...... */}
+
+            <table className="table table-striped">
+              <thead className="thead-dark">
+                <tr>
+                  <th scope="col" colSpan={3}>
+                    <Formik
+                      enableReinitialize
+                      initialValues={{ search: "" }}
+                      onSubmit={(values) => {
+                        getAllDelivererList(values.search);
+                      }}>
+                      <Form>
+                        <div className="form-outline" style={{ float: "left", marginRight: "10px" }}>
+                          <Field
+                            type="text"
+                            name="search"
+                            placeholder="Search"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+                        <div style={{ float: "left" }}>
+                          <button type="submit" className="btn btn-secondary" style={{ padding: "7px 9px" }}>
+                            <BiSearch />
+                          </button>
+                        </div>
+                      </Form>
+                    </Formik>
+                  </th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+
+                  <th scope="col" style={{ textAlign: "right" }} colSpan={3}>
                     <button
-                      style={{ width: "20%", marginLeft: "30px" }}
-                      className="btn btn-primary btn-lg"
-                      type="submit">
-                      Save
+                      type="button"
+                      className="btn btn-primary"
+                      style={{ padding: "7px 10px" }}
+                      onClick={() => {
+                        setSelectedDelivererId(-100);
+                        if (type == "company") {
+                          setAddShippingCompanyVisible(true);
+                        } else {
+                          setAddDelivererVisible(true);
+                        }
+                      }}>
+                      {type == "company" ? "+ Add Company" : "+ Add Deliverer"}
                     </button>
-                  </div>
-                </Form>
-              </Formik>
-            </div>
-          </div>
-        </div>
-        {/*.......add Deliverer form here....... */}
-        <div className="fullShadow" style={addDelivererVisible ? { display: "block" } : { display: "none" }}>
-          <div className="delivererFormBg">
-            <div style={{ padding: "0px 10px" }}>
-              <div>
-                <h2>Create New Deliverer</h2>
-              </div>
-            </div>
-            <div>
-              <Formik
-                initialValues={getAddDelivererInitialValues()}
-                enableReinitialize
-                onSubmit={(values) => {
-                  addEditDeliverer(values);
-                }}>
-                <Form>
-                  <div className="newDelivererForm">
-                    {/*................title......................*/}
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">
-                        {type == "company" ? "Company Name" : "Deliverer Name"}
-                      </label>
-                      <Field
-                        type="text"
-                        name="name"
-                        placeholder="Deliverer Name"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Login ID</label>
-                      <Field
-                        type="text"
-                        name="user_id"
-                        placeholder="Deliverer Name"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "25%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Country: </label>
-                      <Field as="select" name="country" className="select form-control-lg" style={{ width: "100%" }}>
-                        {allCountries &&
-                          allCountries.map((c, index) => (
-                            <option key={index} value={c.country}>
-                              {c.country}
-                            </option>
-                          ))}
-                      </Field>
-                    </div>
-                    <div className="form-outline" style={{ width: "25%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">City</label>
-                      <Field as="select" name="city" className="select form-control-lg" style={{ width: "100%" }}>
-                        {allCities &&
-                          allCities.map((c, index) => (
-                            <option key={index} value={c.city}>
-                              {c.city}
-                            </option>
-                          ))}
-                      </Field>
-                    </div>
-                    <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                      <label className="form-custom-label">e-Mail</label>
-                      <Field type="email" name="email" placeholder="email" className="form-control form-control-lg" />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Phone</label>
-                      <Field type="text" name="phone" placeholder="Phone" className="form-control form-control-lg" />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Whatsapp</label>
-                      <Field
-                        type="text"
-                        name="whatsapp"
-                        placeholder="WhatsApp"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Password</label>
-                      <Field
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Password Again</label>
-                      <Field
-                        type="password"
-                        name="password_again"
-                        placeholder="Password Again"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label" style={{ width: "100%" }}>
-                        Status
-                      </label>
-                      <div
-                        style={{
-                          border: "1px solid lightgray",
-                          borderRadius: "4px",
-                          minHeight: "42px",
-                          padding: "3px 12px",
-                        }}>
-                        <div style={{ float: "left", paddingTop: "4px" }}>Inactive</div>
-                        <div style={{ float: "left", margin: "0px 20px" }}>
-                          <label className="switch">
-                            <input type="checkbox" id="isActive" name="isActive" />
-                            <span className="slider round"></span>
-                          </label>
-                        </div>
-                        <div style={{ float: "left", paddingTop: "4px" }}>Active</div>
-                      </div>
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label" style={{ width: "100%" }}>
-                        Set shipping cost
-                      </label>
-                      <div
-                        style={{
-                          border: "1px solid lightgray",
-                          borderRadius: "4px",
-                          minHeight: "42px",
-                          padding: "3px 12px",
-                        }}>
-                        <div style={{ float: "left", paddingTop: "4px" }}>Manual</div>
-                        <div style={{ float: "left", margin: "0px 20px" }}>
-                          <label className="switch">
-                            <input type="checkbox" id="shippingAuto" name="shippingAuto" />
-                            <span className="slider round"></span>
-                          </label>
-                        </div>
-                        <div style={{ float: "left", paddingTop: "4px" }}>Automatic</div>
-                      </div>
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Default shipping cost (DH)</label>
-                      <Field
-                        type="number"
-                        name="defaultShippingCost"
-                        placeholder="0"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Stock Alert</label>
-                      <Field type="number" name="stockAlert" placeholder="0" className="form-control form-control-lg" />
-                    </div>
-
-                    <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
-                      <button
-                        style={{ width: "20%" }}
-                        className="btn btn-secondary btn-lg"
-                        type="button"
-                        onClick={() => {
-                          setAddDelivererVisible(false);
-                        }}>
-                        Cancel
-                      </button>
-
-                      <button
-                        style={{ width: "20%", marginLeft: "30px" }}
-                        className="btn btn-primary btn-lg"
-                        type="submit">
-                        {selectedDelivererId > 0 ? "Edit Deliverer" : "Add Deliverer"}
-                      </button>
-                    </div>
-                  </div>
-                </Form>
-              </Formik>
-            </div>
-          </div>
-        </div>
-
-        {/*.......add shipping company form here....... */}
-        <div className="fullShadow" style={addShippingCompanyVisible ? { display: "block" } : { display: "none" }}>
-          <div className="shippingFormBg">
-            <div style={{ padding: "0px 10px" }}>
-              <div>
-                <h2>Create New Shipping Company</h2>
-              </div>
-            </div>
-            <div>
-              <Formik
-                initialValues={getAddShippingCompanyInitialValues()}
-                enableReinitialize
-                onSubmit={(values) => {
-                  addEditShippingCompany(values);
-                }}>
-                <Form>
-                  <div className="newDelivererForm">
-                    {/*................title......................*/}
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Company Name</label>
-                      <Field
-                        type="text"
-                        name="name"
-                        placeholder="Company Name"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                      <label className="form-custom-label">e-Mail</label>
-                      <Field type="email" name="email" placeholder="email" className="form-control form-control-lg" />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Phone</label>
-                      <Field type="text" name="phone" placeholder="Phone" className="form-control form-control-lg" />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Whatsapp</label>
-                      <Field
-                        type="text"
-                        name="whatsapp"
-                        placeholder="WhatsApp"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Default shipping cost (DH)</label>
-                      <Field
-                        type="number"
-                        name="defaultShippingCost"
-                        placeholder="0"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Stock Alert</label>
-                      <Field type="number" name="stockAlert" placeholder="0" className="form-control form-control-lg" />
-                    </div>
-
-                    <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
-                      <button
-                        style={{ width: "20%" }}
-                        className="btn btn-secondary btn-lg"
-                        type="button"
-                        onClick={() => {
-                          setAddShippingCompanyVisible(false);
-                        }}>
-                        Cancel
-                      </button>
-
-                      <button
-                        style={{ width: "20%", marginLeft: "30px" }}
-                        className="btn btn-primary btn-lg"
-                        type="submit">
-                        {selectedDelivererId > 0 ? "Edit Company" : "Add Company"}
-                      </button>
-                    </div>
-                  </div>
-                </Form>
-              </Formik>
-            </div>
-          </div>
-        </div>
-
-        {/* .......list all deliverers or companies...... */}
-
-        <table className="table table-striped">
-          <thead className="thead-dark">
-            <tr>
-              <th scope="col" colSpan={3}>
-                <Formik
-                  enableReinitialize
-                  initialValues={{ search: "" }}
-                  onSubmit={(values) => {
-                    getAllDelivererList(values.search);
-                  }}>
-                  <Form>
-                    <div className="form-outline" style={{ float: "left", marginRight: "10px" }}>
-                      <Field type="text" name="search" placeholder="Search" className="form-control form-control-lg" />
-                    </div>
-                    <div style={{ float: "left" }}>
-                      <button type="submit" className="btn btn-secondary" style={{ padding: "7px 9px" }}>
-                        <BiSearch />
-                      </button>
-                    </div>
-                  </Form>
-                </Formik>
-              </th>
-              <th scope="col"></th>
-              <th scope="col"></th>
-
-              <th scope="col" style={{ textAlign: "right" }} colSpan={3}>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  style={{ padding: "7px 10px" }}
-                  onClick={() => {
-                    setSelectedDelivererId(-100);
-                    if (type == "company") {
-                      setAddShippingCompanyVisible(true);
-                    } else {
-                      setAddDelivererVisible(true);
-                    }
-                  }}>
-                  {type == "company" ? "+ Add Company" : "+ Add Deliverer"}
-                </button>
-              </th>
-            </tr>
-            <tr>
-              <th scope="col">Deliverer Name</th>
-              <th scope="col">email</th>
-              <th scope="col">Stock</th>
-              <th scope="col">Delivery Rate</th>
-              <th scope="col">Total Debit</th>
-              <th scope="col">Default Shipping Cost</th>
-              {type == "individual" && <th scope="col">Status</th>}
-
-              <th scope="col" style={{ width: "13%" }}>
-                Actions
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {allDelivererList &&
-              allDelivererList.map((deliverer, index) => (
-                <tr key={index}>
-                  <td>
-                    <div style={{ float: "left", marginRight: "8px" }}>
-                      <BiUser /> {deliverer.user_id}{" "}
-                    </div>
-                    <br />
-                    <div style={{ float: "left" }}>{deliverer.name}</div>
-                    <br />
-                    <BiPhone /> <a href="tel://{user.phone}">{deliverer.phone}</a>
-                  </td>
-                  <td>{deliverer.email}</td>
-                  <td>Alert quantity: {deliverer.stock_alert}</td>
-                  <td>0%</td>
-                  <td>TD: 0</td>
-                  <td>{deliverer.default_shipping_cost}</td>
-                  {type == "individual" && (
-                    <td>
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-circle btn-sm"
-                        style={deliverer.status == 1 ? { backgroundColor: "green" } : { backgroundColor: "red" }}>
-                        {deliverer.status == 1 ? "Activated" : "Deactivated"}
-                      </button>
-                    </td>
-                  )}
-
-                  <td>
-                    {/*.....Actions here.........*/}
-                    <CustomEditIcon
-                      id={deliverer.id}
-                      deletePressedFunc={deleteButtonPressed}
-                      editPressedFunc={editButtonPressed}
-                      citiesPressedFunc={citiesButtonPressed}
-                      stockPressedFunc={stockButtonPressed}
-                      commissionsPressedFunc={commissionsButtonPressed}
-                      userType="deliverer"
-                    />
-                    {/*....Actions End Here......*/}
-                  </td>
+                  </th>
                 </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
+                <tr>
+                  <th scope="col">Deliverer Name</th>
+                  <th scope="col">email</th>
+                  <th scope="col">Stock</th>
+                  <th scope="col">Delivery Rate</th>
+                  <th scope="col">Total Debit</th>
+                  <th scope="col">Default Shipping Cost</th>
+                  {type == "individual" && <th scope="col">Status</th>}
+
+                  <th scope="col" style={{ width: "13%" }}>
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {allDelivererList &&
+                  allDelivererList.map((deliverer, index) => (
+                    <tr key={index}>
+                      <td>
+                        <div style={{ float: "left", marginRight: "8px" }}>
+                          <BiUser /> {deliverer.user_id}{" "}
+                        </div>
+                        <br />
+                        <div style={{ float: "left" }}>{deliverer.name}</div>
+                        <br />
+                        <BiPhone /> <a href="tel://{user.phone}">{deliverer.phone}</a>
+                      </td>
+                      <td>{deliverer.email}</td>
+                      <td>Alert quantity: {deliverer.stock_alert}</td>
+                      <td>0%</td>
+                      <td>TD: 0</td>
+                      <td>{deliverer.default_shipping_cost}</td>
+                      {type == "individual" && (
+                        <td>
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-circle btn-sm"
+                            style={deliverer.status == 1 ? { backgroundColor: "green" } : { backgroundColor: "red" }}>
+                            {deliverer.status == 1 ? "Activated" : "Deactivated"}
+                          </button>
+                        </td>
+                      )}
+
+                      <td>
+                        {/*.....Actions here.........*/}
+                        <CustomEditIcon
+                          id={deliverer.id}
+                          deletePressedFunc={deleteButtonPressed}
+                          editPressedFunc={editButtonPressed}
+                          citiesPressedFunc={citiesButtonPressed}
+                          stockPressedFunc={stockButtonPressed}
+                          commissionsPressedFunc={commissionsButtonPressed}
+                          userType="deliverer"
+                        />
+                        {/*....Actions End Here......*/}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      {!loggedIn && <AccessDenied />}
     </div>
   );
 }

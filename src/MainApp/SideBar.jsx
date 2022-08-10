@@ -4,7 +4,6 @@ import { AiFillDashboard, AiOutlineRadiusSetting } from "react-icons/ai";
 import { BsPersonLinesFill } from "react-icons/bs";
 import {
   FaDatabase,
-  FaFacebookMessenger,
   FaListAlt,
   FaProductHunt,
   FaShippingFast,
@@ -92,11 +91,11 @@ const routes = [
     name: "Products Sheet",
     icon: <FaDatabase />,
   },
-  {
-    path: "/messaging",
-    name: "Messaging",
-    icon: <FaFacebookMessenger />,
-  },
+  // {
+  //   path: "/messaging",
+  //   name: "Messaging",
+  //   icon: <FaFacebookMessenger />,
+  // },
 
   // {
   //   path: "/support",
@@ -128,36 +127,19 @@ const SideBar = ({ children, sidebarIsOpen, setSidebarIsOpen }) => {
     },
   };
 
-  function recordNavChanged() {
-    let allPaths = sessionStorage.getItem("paths");
-    if (allPaths == null) {
-      allPaths = location.pathname;
-    } else {
-      allPaths += "," + location.pathname;
-    }
-    var pathsArray = allPaths.split(",");
-
-    let uniqueArray = [...new Set(pathsArray)];
-
-    if (uniqueArray.length > 8) {
-      uniqueArray.shift();
-    }
-    sessionStorage.setItem("paths", uniqueArray.join(","));
-  }
-
   useEffect(() => {
-    console.log("recording..." + children.type);
+    console.log("sidebar render..");
+  }, [sidebarIsOpen]);
 
-    recordNavChanged();
-  }, [history]);
+  var loggedIn = sessionStorage.getItem("uid");
 
   return (
     <>
       <div className="main-container">
         <motion.div
+          style={loggedIn ? {} : { display: "none" }}
           animate={{
             width: sidebarIsOpen ? "240px" : "60px",
-
             transition: {
               duration: 0.3,
               type: "none",

@@ -6,6 +6,7 @@ import { FaSearch } from "react-icons/fa";
 import WarehouseBlock from "../Components/WarehouseBlock";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
+import AccessDenied from "./AccessDenied";
 
 export default function Warehouses({ toggle }) {
   const [allWarehouseList, setAllWarehouseList] = useState([]);
@@ -125,241 +126,259 @@ export default function Warehouses({ toggle }) {
     };
   }
 
+  var loggedIn = sessionStorage.getItem("uid");
+
   return (
     <div>
-      <TopBar toggle={toggle} />
-      <Tabs />
-      <div className="container-fluid">
-        {/*....delete conformation.....*/}
-        <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
-          <div className="deleteConformationBg">
-            <div>
-              <h4>Warning</h4>
-            </div>
-            <div>Are you sure you want to delete this item?</div>
-            <div style={{ float: "right", width: "100%", padding: "18px 0px 10px 0px" }}>
-              <button
-                style={{ width: "40%" }}
-                className="btn btn-secondary btn-lg"
-                type="button"
-                onClick={() => {
-                  setDeleteConformationVisibility(false);
-                }}>
-                Cancel
-              </button>
-
-              <button
-                style={{ width: "40%", marginLeft: "30px" }}
-                className="btn btn-primary btn-lg"
-                type="submit"
-                onClick={deleteSelectedWarehouse}>
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/*....add city.....*/}
-        <div className="fullShadow" style={addCityFormVisible ? { display: "flex" } : { display: "none" }}>
-          <div className="cityFormBg">
-            <div style={{ padding: "0px 10px" }}>
-              <div style={{ marginBottom: "18px" }}>
-                <h2>Add new city</h2>
-              </div>
-            </div>
-            <div>
-              <Formik
-                initialValues={{
-                  city: "",
-                }}
-                onSubmit={(values) => {
-                  addNewCity(values);
-                }}>
-                <Form>
-                  <div className="newCityForm">
-                    {/*................title......................*/}
-
-                    <div className="form-outline" style={{ padding: "0px 10px" }}>
-                      <label className="form-custom-label">Category Name</label>
-                      <Field type="text" name="city" placeholder="City" className="form-control form-control-lg" />
-                    </div>
-
-                    <div style={{ float: "right", width: "100%", padding: "12px 10px 3px 10px" }}>
-                      <button
-                        style={{ width: "40%" }}
-                        className="btn btn-secondary btn-lg"
-                        type="button"
-                        onClick={() => {
-                          setAddCityFormVisible(false);
-                          setAddWarehouseFormVisibility(true);
-                        }}>
-                        Cancel
-                      </button>
-
-                      <button
-                        style={{ width: "40%", marginLeft: "30px" }}
-                        className="btn btn-primary btn-lg"
-                        type="submit">
-                        Add City
-                      </button>
-                    </div>
-                  </div>
-                </Form>
-              </Formik>
-            </div>
-          </div>
-        </div>
-
-        {/*.......add warehouse form here....... */}
-        <div className="fullShadow" style={addWarehouseVisible ? { display: "block" } : { display: "none" }}>
-          <div className="warehouseFormBg">
-            <div style={{ padding: "0px 10px" }}>
-              <div style={{ float: "left", width: "60%" }}>
-                <h2>Create New Warehouse</h2>
-              </div>
-              <div style={{ float: "right", width: "30%" }}>
-                <div style={{ width: "60%", float: "left", paddingTop: "8px" }}>
-                  <div style={{ width: "45%", float: "left" }}>
-                    <label className="switch">
-                      <input type="checkbox" id="isdefault" name="isdefault" />
-                      <span className="slider round"></span>
-                    </label>
-                  </div>
-                  <div style={{ paddingTop: "5px", float: "left", paddingLeft: "7px", width: "30%" }}>Default</div>
+      {loggedIn && (
+        <div>
+          <TopBar toggle={toggle} />
+          <Tabs />
+          <div className="container-fluid">
+            {/*....delete conformation.....*/}
+            <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
+              <div className="deleteConformationBg">
+                <div>
+                  <h4>Warning</h4>
                 </div>
-                <div style={{ float: "right", width: "40%" }}>
+                <div>Are you sure you want to delete this item?</div>
+                <div style={{ float: "right", width: "100%", padding: "18px 0px 10px 0px" }}>
                   <button
-                    style={{ float: "right" }}
+                    style={{ width: "40%" }}
+                    className="btn btn-secondary btn-lg"
+                    type="button"
+                    onClick={() => {
+                      setDeleteConformationVisibility(false);
+                    }}>
+                    Cancel
+                  </button>
+
+                  <button
+                    style={{ width: "40%", marginLeft: "30px" }}
                     className="btn btn-primary btn-lg"
                     type="submit"
-                    onClick={() => {
-                      setAddCityFormVisible(true);
-                      setAddWarehouseFormVisibility(false);
-                    }}>
-                    + City
+                    onClick={deleteSelectedWarehouse}>
+                    Confirm
                   </button>
                 </div>
               </div>
             </div>
-            <div>
+
+            {/*....add city.....*/}
+            <div className="fullShadow" style={addCityFormVisible ? { display: "flex" } : { display: "none" }}>
+              <div className="cityFormBg">
+                <div style={{ padding: "0px 10px" }}>
+                  <div style={{ marginBottom: "18px" }}>
+                    <h2>Add new city</h2>
+                  </div>
+                </div>
+                <div>
+                  <Formik
+                    initialValues={{
+                      city: "",
+                    }}
+                    onSubmit={(values) => {
+                      addNewCity(values);
+                    }}>
+                    <Form>
+                      <div className="newCityForm">
+                        {/*................title......................*/}
+
+                        <div className="form-outline" style={{ padding: "0px 10px" }}>
+                          <label className="form-custom-label">Category Name</label>
+                          <Field type="text" name="city" placeholder="City" className="form-control form-control-lg" />
+                        </div>
+
+                        <div style={{ float: "right", width: "100%", padding: "12px 10px 3px 10px" }}>
+                          <button
+                            style={{ width: "40%" }}
+                            className="btn btn-secondary btn-lg"
+                            type="button"
+                            onClick={() => {
+                              setAddCityFormVisible(false);
+                              setAddWarehouseFormVisibility(true);
+                            }}>
+                            Cancel
+                          </button>
+
+                          <button
+                            style={{ width: "40%", marginLeft: "30px" }}
+                            className="btn btn-primary btn-lg"
+                            type="submit">
+                            Add City
+                          </button>
+                        </div>
+                      </div>
+                    </Form>
+                  </Formik>
+                </div>
+              </div>
+            </div>
+
+            {/*.......add warehouse form here....... */}
+            <div className="fullShadow" style={addWarehouseVisible ? { display: "block" } : { display: "none" }}>
+              <div className="warehouseFormBg">
+                <div style={{ padding: "0px 10px" }}>
+                  <div style={{ float: "left", width: "60%" }}>
+                    <h2>Create New Warehouse</h2>
+                  </div>
+                  <div style={{ float: "right", width: "30%" }}>
+                    <div style={{ width: "60%", float: "left", paddingTop: "8px" }}>
+                      <div style={{ width: "45%", float: "left" }}>
+                        <label className="switch">
+                          <input type="checkbox" id="isdefault" name="isdefault" />
+                          <span className="slider round"></span>
+                        </label>
+                      </div>
+                      <div style={{ paddingTop: "5px", float: "left", paddingLeft: "7px", width: "30%" }}>Default</div>
+                    </div>
+                    <div style={{ float: "right", width: "40%" }}>
+                      <button
+                        style={{ float: "right" }}
+                        className="btn btn-primary btn-lg"
+                        type="submit"
+                        onClick={() => {
+                          setAddCityFormVisible(true);
+                          setAddWarehouseFormVisibility(false);
+                        }}>
+                        + City
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <Formik
+                    initialValues={getAddWarehouseInitialValues()}
+                    enableReinitialize
+                    onSubmit={(values) => {
+                      addEditWarehouse(values);
+                    }}>
+                    <Form>
+                      <div className="newProductForm">
+                        {/*................title......................*/}
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Title</label>
+                          <Field
+                            type="text"
+                            name="title"
+                            placeholder="Title"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">City: </label>
+                          <Field as="select" name="city" className="select form-control-lg" style={{ width: "100%" }}>
+                            {allCities &&
+                              allCities.map((c, index) => (
+                                <option key={index} value={c.city}>
+                                  {c.city}
+                                </option>
+                              ))}
+                          </Field>
+                        </div>
+
+                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Address: </label>
+                          <Field
+                            as="textarea"
+                            name="address"
+                            className="select form-control-lg"
+                            style={{ width: "100%" }}
+                          />
+                        </div>
+
+                        <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
+                          <button
+                            style={{ width: "20%" }}
+                            className="btn btn-secondary btn-lg"
+                            type="button"
+                            onClick={() => {
+                              setAddWarehouseFormVisibility(false);
+                            }}>
+                            Cancel
+                          </button>
+
+                          <button
+                            style={{ width: "20%", marginLeft: "30px" }}
+                            className="btn btn-primary btn-lg"
+                            type="submit">
+                            {selectedWarehouseId >= 0 ? "Save" : "Save"}
+                          </button>
+                        </div>
+                      </div>
+                    </Form>
+                  </Formik>
+                </div>
+              </div>
+            </div>
+            {/*....................show warehouses........... */}
+            <div className="warehouse_page_searchform">
               <Formik
-                initialValues={getAddWarehouseInitialValues()}
-                enableReinitialize
+                initialValues={{ keyword: "" }}
                 onSubmit={(values) => {
-                  addEditWarehouse(values);
+                  getAllWarehouseList(values.keyword);
                 }}>
                 <Form>
-                  <div className="newProductForm">
-                    {/*................title......................*/}
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Title</label>
-                      <Field type="text" name="title" placeholder="Title" className="form-control form-control-lg" />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">City: </label>
-                      <Field as="select" name="city" className="select form-control-lg" style={{ width: "100%" }}>
-                        {allCities &&
-                          allCities.map((c, index) => (
-                            <option key={index} value={c.city}>
-                              {c.city}
-                            </option>
-                          ))}
-                      </Field>
-                    </div>
-
-                    <div className="form-outline" style={{ width: "100%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Address: </label>
+                  <div>
+                    <div className="form-outline" style={{ width: "30%", float: "left", padding: "0px 2px" }}>
                       <Field
-                        as="textarea"
-                        name="address"
-                        className="select form-control-lg"
-                        style={{ width: "100%" }}
+                        type="text"
+                        name="keyword"
+                        placeholder="Keyword"
+                        className="form-control form-control-lg"
                       />
                     </div>
 
-                    <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
-                      <button
-                        style={{ width: "20%" }}
-                        className="btn btn-secondary btn-lg"
-                        type="button"
-                        onClick={() => {
-                          setAddWarehouseFormVisibility(false);
-                        }}>
-                        Cancel
-                      </button>
-
-                      <button
-                        style={{ width: "20%", marginLeft: "30px" }}
-                        className="btn btn-primary btn-lg"
-                        type="submit">
-                        {selectedWarehouseId >= 0 ? "Save" : "Save"}
+                    <div style={{ width: "10%", float: "left", padding: "0px 2px" }}>
+                      <button type="submit" className="btn btn-secondary" style={{ width: "42px", height: "42px" }}>
+                        <FaSearch />
                       </button>
                     </div>
+                  </div>
+                  <div style={{ width: "50%", float: "right", textAlign: "right" }}>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      style={{ width: "42", height: "42:px" }}
+                      onClick={() => {
+                        getAllWarehouseList();
+                      }}>
+                      <AiOutlineReload />
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      style={{ height: "42px", marginLeft: "10px" }}
+                      onClick={() => {
+                        setAddWarehouseFormVisibility(true);
+                      }}>
+                      + Add Warehouse
+                    </button>
                   </div>
                 </Form>
               </Formik>
             </div>
+            <div>
+              {allWarehouseList &&
+                allWarehouseList.map((w, index) => (
+                  <WarehouseBlock
+                    editPressedFunc={editButtonPressed}
+                    deletePressedFunc={deleteButtonPressed}
+                    key={index}
+                    id={w.id}
+                    title={w.title}
+                    balance={"100DH"}
+                    city={w.city}
+                  />
+                ))}
+            </div>
           </div>
         </div>
-        {/*....................show warehouses........... */}
-        <div className="warehouse_page_searchform">
-          <Formik
-            initialValues={{ keyword: "" }}
-            onSubmit={(values) => {
-              getAllWarehouseList(values.keyword);
-            }}>
-            <Form>
-              <div>
-                <div className="form-outline" style={{ width: "30%", float: "left", padding: "0px 2px" }}>
-                  <Field type="text" name="keyword" placeholder="Keyword" className="form-control form-control-lg" />
-                </div>
+      )}
 
-                <div style={{ width: "10%", float: "left", padding: "0px 2px" }}>
-                  <button type="submit" className="btn btn-secondary" style={{ width: "42px", height: "42px" }}>
-                    <FaSearch />
-                  </button>
-                </div>
-              </div>
-              <div style={{ width: "50%", float: "right", textAlign: "right" }}>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  style={{ width: "42", height: "42:px" }}
-                  onClick={() => {
-                    getAllWarehouseList();
-                  }}>
-                  <AiOutlineReload />
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  style={{ height: "42px", marginLeft: "10px" }}
-                  onClick={() => {
-                    setAddWarehouseFormVisibility(true);
-                  }}>
-                  + Add Warehouse
-                </button>
-              </div>
-            </Form>
-          </Formik>
-        </div>
-        <div>
-          {allWarehouseList &&
-            allWarehouseList.map((w, index) => (
-              <WarehouseBlock
-                editPressedFunc={editButtonPressed}
-                deletePressedFunc={deleteButtonPressed}
-                key={index}
-                id={w.id}
-                title={w.title}
-                balance={"100DH"}
-                city={w.city}
-              />
-            ))}
-        </div>
-      </div>
+      {!loggedIn && <AccessDenied />}
     </div>
   );
 }

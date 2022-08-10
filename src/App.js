@@ -22,15 +22,16 @@ import Users from "./Pages/Users";
 import Warehouses from "./Pages/Warehouses";
 
 function App() {
-  const [sidebarIsOpen, setIsSidebarOpen] = useState(true);
+  let isLoggedIn = sessionStorage.getItem("uid") && sessionStorage.getItem("uid").length > 0 ? true : false;
+  const [sidebarIsOpen, setIsSidebarOpen] = useState(isLoggedIn);
 
   const toggle = () => {
     setIsSidebarOpen(!sidebarIsOpen);
   };
 
-  function setSidebarIsOpen(isOpen) {
+  const setSidebarIsOpen = (isOpen) => {
     setIsSidebarOpen(isOpen);
-  }
+  };
 
   const collapseAll = () => {
     const listItems = document.querySelectorAll(".dottedMenuContainer");
@@ -74,12 +75,20 @@ function App() {
     }
   }, []);
 
+  var loggedIn = sessionStorage.getItem("uid");
+
   return (
     <div onClick={collapseAll}>
       <Router>
         <SideBar sidebarIsOpen={sidebarIsOpen} setSidebarIsOpen={setSidebarIsOpen}>
           <Routes>
-            <Route exact path="/" element={<Login />} />
+            <Route
+              exact
+              path="/"
+              element={
+                loggedIn ? <Dashboard toggle={toggle} /> : <Login toggle={toggle} setSidebarIsOpen={setSidebarIsOpen} />
+              }
+            />
             <Route path="/dashboard" element={<Dashboard toggle={toggle} />} />
             <Route path="/users" element={<Users type="all" toggle={toggle} />} />
             <Route path="/agents" element={<Users type="agent" toggle={toggle} />} />

@@ -5,6 +5,7 @@ import { BiSearch } from "react-icons/bi";
 import CustomEditIcon from "../Components/CustomEditIcon";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
+import AccessDenied from "./AccessDenied";
 
 function Suppliers({ toggle }) {
   const [allSupplierList, setAllSupplierList] = useState([]);
@@ -122,195 +123,217 @@ function Suppliers({ toggle }) {
     getAllCountryList();
   }, []);
 
+  var loggedIn = sessionStorage.getItem("uid");
+
   return (
     <div>
-      <TopBar toggle={toggle} />
-      <Tabs />
-      <div className="container-fluid">
-        {/*....delete conformation.....*/}
-        <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
-          <div className="deleteConformationBg">
-            <div>
-              <h4>Warning</h4>
-            </div>
-            <div>Are you sure you want to delete this item?</div>
-            <div style={{ float: "right", width: "100%", padding: "18px 0px 10px 0px" }}>
-              <button
-                style={{ width: "40%" }}
-                className="btn btn-secondary btn-lg"
-                type="button"
-                onClick={updateDeleteConformationVisibility}>
-                Cancel
-              </button>
+      {loggedIn && (
+        <div>
+          <TopBar toggle={toggle} />
+          <Tabs />
+          <div className="container-fluid">
+            {/*....delete conformation.....*/}
+            <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
+              <div className="deleteConformationBg">
+                <div>
+                  <h4>Warning</h4>
+                </div>
+                <div>Are you sure you want to delete this item?</div>
+                <div style={{ float: "right", width: "100%", padding: "18px 0px 10px 0px" }}>
+                  <button
+                    style={{ width: "40%" }}
+                    className="btn btn-secondary btn-lg"
+                    type="button"
+                    onClick={updateDeleteConformationVisibility}>
+                    Cancel
+                  </button>
 
-              <button
-                style={{ width: "40%", marginLeft: "30px" }}
-                className="btn btn-primary btn-lg"
-                type="submit"
-                onClick={deleteSelectedSupplier}>
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/*.......add supplier form here....... */}
-        <div className="fullShadow" style={addSupplierVisible ? { display: "block" } : { display: "none" }}>
-          <div className="supplierFormBg">
-            <div style={{ padding: "0px 10px" }}>
-              <div>
-                <h2>Create New Supplier</h2>
+                  <button
+                    style={{ width: "40%", marginLeft: "30px" }}
+                    className="btn btn-primary btn-lg"
+                    type="submit"
+                    onClick={deleteSelectedSupplier}>
+                    Confirm
+                  </button>
+                </div>
               </div>
             </div>
-            <div>
-              <Formik
-                initialValues={getAddSupplierInitialValues()}
-                enableReinitialize
-                onSubmit={(values) => {
-                  addEditSupplier(values);
-                }}>
-                <Form>
-                  <div className="newSupplierForm">
-                    {/*................title......................*/}
 
-                    <div className="form-outline" style={{ width: "100%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Supplier Name</label>
-                      <Field
-                        type="text"
-                        name="name"
-                        placeholder="Supplier Name"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Country: </label>
-                      <Field as="select" name="country" className="select form-control-lg" style={{ width: "100%" }}>
-                        {allCountries &&
-                          allCountries.map((c, index) => (
-                            <option key={index} value={c.country}>
-                              {c.country}
-                            </option>
-                          ))}
-                      </Field>
-                    </div>
-                    <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                      <label className="form-custom-label">City</label>
-                      <Field type="text" name="city" placeholder="City" className="form-control form-control-lg" />
-                    </div>
-                    <div className="form-outline" style={{ width: "100%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Address: </label>
-                      <Field
-                        as="textarea"
-                        name="address"
-                        className="select form-control-lg"
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                    <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Phone</label>
-                      <Field type="text" name="phone" placeholder="Phone" className="form-control form-control-lg" />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Whatsapp</label>
-                      <Field
-                        type="text"
-                        name="whatsapp"
-                        placeholder="WhatsApp"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-
-                    <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
-                      <button
-                        style={{ width: "20%" }}
-                        className="btn btn-secondary btn-lg"
-                        type="button"
-                        onClick={updateAddSupplierFormVisibility}>
-                        Cancel
-                      </button>
-
-                      <button
-                        style={{ width: "20%", marginLeft: "30px" }}
-                        className="btn btn-primary btn-lg"
-                        type="submit">
-                        {selectedSupplierId > 0 ? "Edit Supplier" : "Add Supplier"}
-                      </button>
-                    </div>
+            {/*.......add supplier form here....... */}
+            <div className="fullShadow" style={addSupplierVisible ? { display: "block" } : { display: "none" }}>
+              <div className="supplierFormBg">
+                <div style={{ padding: "0px 10px" }}>
+                  <div>
+                    <h2>Create New Supplier</h2>
                   </div>
-                </Form>
-              </Formik>
+                </div>
+                <div>
+                  <Formik
+                    initialValues={getAddSupplierInitialValues()}
+                    enableReinitialize
+                    onSubmit={(values) => {
+                      addEditSupplier(values);
+                    }}>
+                    <Form>
+                      <div className="newSupplierForm">
+                        {/*................title......................*/}
+
+                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Supplier Name</label>
+                          <Field
+                            type="text"
+                            name="name"
+                            placeholder="Supplier Name"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Country: </label>
+                          <Field
+                            as="select"
+                            name="country"
+                            className="select form-control-lg"
+                            style={{ width: "100%" }}>
+                            {allCountries &&
+                              allCountries.map((c, index) => (
+                                <option key={index} value={c.country}>
+                                  {c.country}
+                                </option>
+                              ))}
+                          </Field>
+                        </div>
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
+                          <label className="form-custom-label">City</label>
+                          <Field type="text" name="city" placeholder="City" className="form-control form-control-lg" />
+                        </div>
+                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Address: </label>
+                          <Field
+                            as="textarea"
+                            name="address"
+                            className="select form-control-lg"
+                            style={{ width: "100%" }}
+                          />
+                        </div>
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Phone</label>
+                          <Field
+                            type="text"
+                            name="phone"
+                            placeholder="Phone"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Whatsapp</label>
+                          <Field
+                            type="text"
+                            name="whatsapp"
+                            placeholder="WhatsApp"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
+                          <button
+                            style={{ width: "20%" }}
+                            className="btn btn-secondary btn-lg"
+                            type="button"
+                            onClick={updateAddSupplierFormVisibility}>
+                            Cancel
+                          </button>
+
+                          <button
+                            style={{ width: "20%", marginLeft: "30px" }}
+                            className="btn btn-primary btn-lg"
+                            type="submit">
+                            {selectedSupplierId > 0 ? "Edit Supplier" : "Add Supplier"}
+                          </button>
+                        </div>
+                      </div>
+                    </Form>
+                  </Formik>
+                </div>
+              </div>
             </div>
+            <table className="table table-striped">
+              <thead className="thead-dark">
+                <tr>
+                  <th scope="col" colSpan={2}>
+                    <Formik
+                      enableReinitialize
+                      initialValues={{ search: "" }}
+                      onSubmit={(values) => {
+                        getAllSupplierList(values.search);
+                      }}>
+                      <Form>
+                        <div className="form-outline" style={{ float: "left", marginRight: "10px" }}>
+                          <Field
+                            type="text"
+                            name="search"
+                            placeholder="Search"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+                        <div style={{ float: "left" }}>
+                          <button type="submit" className="btn btn-secondary" style={{ padding: "7px 9px" }}>
+                            <BiSearch />
+                          </button>
+                        </div>
+                      </Form>
+                    </Formik>
+                  </th>
+                  <th scope="col"></th>
+
+                  <th scope="col" style={{ textAlign: "right" }} colSpan={2}>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      style={{ padding: "7px 10px" }}
+                      onClick={updateAddSupplierFormVisibility}>
+                      + Add Supplier
+                    </button>
+                  </th>
+                </tr>
+                <tr>
+                  <th scope="col">Supplier Name</th>
+                  <th scope="col">Country</th>
+                  <th scope="col">Mobile</th>
+                  <th scope="col">Whatsapp</th>
+                  <th scope="col" style={{ width: "13%" }}>
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {allSupplierList &&
+                  allSupplierList.map((supplier, index) => (
+                    <tr key={index}>
+                      <td>{supplier.name}</td>
+                      <td>{supplier.country}</td>
+                      <td>{supplier.phone}</td>
+                      <td>{supplier.whatsapp}</td>
+                      <td>
+                        {/*.....Actions here.........*/}
+                        <CustomEditIcon
+                          id={supplier.id}
+                          deletePressedFunc={updateDeleteConformationVisibility}
+                          editPressedFunc={editButtonPressed}
+                        />
+                        {/*....Actions End Here......*/}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
           </div>
         </div>
-        <table className="table table-striped">
-          <thead className="thead-dark">
-            <tr>
-              <th scope="col" colSpan={2}>
-                <Formik
-                  enableReinitialize
-                  initialValues={{ search: "" }}
-                  onSubmit={(values) => {
-                    getAllSupplierList(values.search);
-                  }}>
-                  <Form>
-                    <div className="form-outline" style={{ float: "left", marginRight: "10px" }}>
-                      <Field type="text" name="search" placeholder="Search" className="form-control form-control-lg" />
-                    </div>
-                    <div style={{ float: "left" }}>
-                      <button type="submit" className="btn btn-secondary" style={{ padding: "7px 9px" }}>
-                        <BiSearch />
-                      </button>
-                    </div>
-                  </Form>
-                </Formik>
-              </th>
-              <th scope="col"></th>
+      )}
 
-              <th scope="col" style={{ textAlign: "right" }} colSpan={2}>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  style={{ padding: "7px 10px" }}
-                  onClick={updateAddSupplierFormVisibility}>
-                  + Add Supplier
-                </button>
-              </th>
-            </tr>
-            <tr>
-              <th scope="col">Supplier Name</th>
-              <th scope="col">Country</th>
-              <th scope="col">Mobile</th>
-              <th scope="col">Whatsapp</th>
-              <th scope="col" style={{ width: "13%" }}>
-                Actions
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {allSupplierList &&
-              allSupplierList.map((supplier, index) => (
-                <tr key={index}>
-                  <td>{supplier.name}</td>
-                  <td>{supplier.country}</td>
-                  <td>{supplier.phone}</td>
-                  <td>{supplier.whatsapp}</td>
-                  <td>
-                    {/*.....Actions here.........*/}
-                    <CustomEditIcon
-                      id={supplier.id}
-                      deletePressedFunc={updateDeleteConformationVisibility}
-                      editPressedFunc={editButtonPressed}
-                    />
-                    {/*....Actions End Here......*/}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
+      {!loggedIn && <AccessDenied />}
     </div>
   );
 }

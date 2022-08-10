@@ -1,13 +1,21 @@
 import React from "react";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
+import AccessDenied from "./AccessDenied";
 
 function SalesChannels({ toggle }) {
+  var loggedIn = sessionStorage.getItem("uid");
+
   return (
     <div>
-      <TopBar toggle={toggle} />
-      <Tabs />
-      SalesChannels
+      {loggedIn && (
+        <div>
+          <TopBar toggle={toggle} />
+          <Tabs />
+          SalesChannels
+        </div>
+      )}
+      {!loggedIn && <AccessDenied />}
     </div>
   );
 }

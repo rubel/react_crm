@@ -2,8 +2,10 @@ import axios from "axios";
 import { Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import CustomEditIcon from "../Components/CustomEditIcon";
+import FormikAutocomplete from "../Components/FormikAutocomplete";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
+import AccessDenied from "./AccessDenied";
 
 export default function Products({ toggle }) {
   const [allProductList, setAllProductList] = useState([]);
@@ -146,225 +148,238 @@ export default function Products({ toggle }) {
     }
   }
 
+  var loggedIn = sessionStorage.getItem("uid");
+
   return (
     <div>
-      <TopBar toggle={toggle} />
-      <Tabs />
-      <div className="container-fluid">
-        {/*....delete conformation.....*/}
-        <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
-          <div className="deleteConformationBg">
-            <div>
-              <h4>Warning</h4>
-            </div>
-            <div>Are you sure you want to delete this item?</div>
-            <div style={{ float: "right", width: "100%", padding: "18px 0px 10px 0px" }}>
-              <button
-                style={{ width: "40%" }}
-                className="btn btn-secondary btn-lg"
-                type="button"
-                onClick={updateDeleteConformationVisibility}>
-                Cancel
-              </button>
+      {loggedIn && (
+        <div>
+          <TopBar toggle={toggle} />
+          <Tabs />
+          <div className="container-fluid">
+            {/*....delete conformation.....*/}
+            <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
+              <div className="deleteConformationBg">
+                <div>
+                  <h4>Warning</h4>
+                </div>
+                <div>Are you sure you want to delete this item?</div>
+                <div style={{ float: "right", width: "100%", padding: "18px 0px 10px 0px" }}>
+                  <button
+                    style={{ width: "40%" }}
+                    className="btn btn-secondary btn-lg"
+                    type="button"
+                    onClick={updateDeleteConformationVisibility}>
+                    Cancel
+                  </button>
 
-              <button
-                style={{ width: "40%", marginLeft: "30px" }}
-                className="btn btn-primary btn-lg"
-                type="submit"
-                onClick={deleteSelectedProduct}>
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-        {/*.......Add category form here...... */}
-        <div className="fullShadow" style={addCategoryVisible ? { display: "flex" } : { display: "none" }}>
-          <div className="categoryFormBg">
-            <div style={{ padding: "0px 10px" }}>
-              <div style={{ marginBottom: "18px" }}>
-                <h2>Create New Category</h2>
+                  <button
+                    style={{ width: "40%", marginLeft: "30px" }}
+                    className="btn btn-primary btn-lg"
+                    type="submit"
+                    onClick={deleteSelectedProduct}>
+                    Confirm
+                  </button>
+                </div>
               </div>
             </div>
-            <div>
-              <Formik
-                initialValues={{
-                  categoryName: "",
-                }}
-                onSubmit={(values) => {
-                  addNewCategory(values);
-                }}>
-                <Form>
-                  <div className="newProductForm">
-                    {/*................title......................*/}
-
-                    <div className="form-outline" style={{ padding: "0px 10px" }}>
-                      <label className="form-custom-label">Category Name</label>
-                      <Field
-                        type="text"
-                        name="categoryName"
-                        placeholder="Category Name"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-
-                    <div style={{ float: "right", width: "100%", padding: "12px 10px 3px 10px" }}>
-                      <button
-                        style={{ width: "40%" }}
-                        className="btn btn-secondary btn-lg"
-                        type="button"
-                        onClick={updateAddCategoryFormVisibility}>
-                        Cancel
-                      </button>
-
-                      <button
-                        style={{ width: "40%", marginLeft: "30px" }}
-                        className="btn btn-primary btn-lg"
-                        type="submit">
-                        Add Category
-                      </button>
-                    </div>
+            {/*.......Add category form here...... */}
+            <div className="fullShadow" style={addCategoryVisible ? { display: "flex" } : { display: "none" }}>
+              <div className="categoryFormBg">
+                <div style={{ padding: "0px 10px" }}>
+                  <div style={{ marginBottom: "18px" }}>
+                    <h2>Create New Category</h2>
                   </div>
-                </Form>
-              </Formik>
-            </div>
-          </div>
-        </div>
-        {/*.......add product form here....... */}
-        <div className="fullShadow" style={addProductVisible ? { display: "block" } : { display: "none" }}>
-          <div className="productFormBg">
-            <div style={{ padding: "0px 10px" }}>
-              <div style={{ float: "left", width: "50%" }}>
-                <h2>Create New Product</h2>
+                </div>
+                <div>
+                  <Formik
+                    initialValues={{
+                      categoryName: "",
+                    }}
+                    onSubmit={(values) => {
+                      addNewCategory(values);
+                    }}>
+                    <Form>
+                      <div className="newProductForm">
+                        {/*................title......................*/}
+
+                        <div className="form-outline" style={{ padding: "0px 10px" }}>
+                          <label className="form-custom-label">Category Name</label>
+                          <Field
+                            type="text"
+                            name="categoryName"
+                            placeholder="Category Name"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div style={{ float: "right", width: "100%", padding: "12px 10px 3px 10px" }}>
+                          <button
+                            style={{ width: "40%" }}
+                            className="btn btn-secondary btn-lg"
+                            type="button"
+                            onClick={updateAddCategoryFormVisibility}>
+                            Cancel
+                          </button>
+
+                          <button
+                            style={{ width: "40%", marginLeft: "30px" }}
+                            className="btn btn-primary btn-lg"
+                            type="submit">
+                            Add Category
+                          </button>
+                        </div>
+                      </div>
+                    </Form>
+                  </Formik>
+                </div>
               </div>
-              <div style={{ float: "right", width: "50%" }}>
-                <button
-                  style={{ float: "right" }}
-                  className="btn btn-primary btn-lg"
-                  type="submit"
-                  onClick={updateAddCategoryFormVisibility}>
-                  + Add Category
-                </button>
-              </div>
             </div>
-            <div>
-              <Formik
-                initialValues={getAddProductInitialValues()}
-                enableReinitialize
-                onSubmit={(values) => {
-                  addEditProduct(values);
-                }}>
-                <Form>
-                  <div className="newProductForm">
-                    {/*................title......................*/}
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Product Name</label>
-                      <Field
-                        type="text"
-                        name="name"
-                        placeholder="Product Name"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Label</label>
-                      <Field type="text" name="label" placeholder="Label" className="form-control form-control-lg" />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">SKU</label>
-                      <Field type="text" name="sku" placeholder="SKU" className="form-control form-control-lg" />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Category</label>
-                      <Field as="select" name="category" className="select form-control-lg" style={{ width: "100%" }}>
-                        {allCategories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.category}
-                          </option>
-                        ))}
-                      </Field>
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Product Cost</label>
-                      <Field type="number" name="price" placeholder="0" className="form-control form-control-lg" />
-                    </div>
-
-                    <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                      <label className="form-custom-label">Default Sale Price</label>
-                      <Field
-                        type="number"
-                        name="defaultSalePrice"
-                        placeholder="0"
-                        className="form-control form-control-lg"
-                      />
-                    </div>
-                    <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
-                      <button
-                        style={{ width: "20%" }}
-                        className="btn btn-secondary btn-lg"
-                        type="button"
-                        onClick={updateAddProductFormVisibility}>
-                        Cancel
-                      </button>
-
-                      <button
-                        style={{ width: "20%", marginLeft: "30px" }}
-                        className="btn btn-primary btn-lg"
-                        type="submit">
-                        {productIdGoingTobeEdited > 0 ? "Edit Product" : "Add Product"}
-                      </button>
-                    </div>
+            {/*.......add product form here....... */}
+            <div className="fullShadow" style={addProductVisible ? { display: "block" } : { display: "none" }}>
+              <div className="productFormBg">
+                <div style={{ padding: "0px 10px" }}>
+                  <div style={{ float: "left", width: "50%" }}>
+                    <h2>Create New Product</h2>
                   </div>
-                </Form>
-              </Formik>
-            </div>
-          </div>
-        </div>
-        <table className="table table-striped">
-          <thead className="thead-dark">
-            <tr>
-              <th scope="col">Product Name</th>
-              <th scope="col">Label</th>
-              <th scope="col">sku</th>
-              <th scope="col">price</th>
-              <th scope="col">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  style={{ padding: "7px 4px" }}
-                  onClick={updateAddProductFormVisibility}>
-                  + Add Product
-                </button>
-              </th>
-            </tr>
-          </thead>
+                  <div style={{ float: "right", width: "50%" }}>
+                    <button
+                      style={{ float: "right" }}
+                      className="btn btn-primary btn-lg"
+                      type="submit"
+                      onClick={updateAddCategoryFormVisibility}>
+                      + Add Category
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <Formik
+                    initialValues={getAddProductInitialValues()}
+                    enableReinitialize
+                    onSubmit={(values) => {
+                      addEditProduct(values);
+                    }}>
+                    <Form>
+                      <div className="newProductForm">
+                        {/*................title......................*/}
 
-          <tbody>
-            {allProductList &&
-              allProductList.map((product, index) => (
-                <tr key={index}>
-                  <td>{product.name}</td>
-                  <td>{product.label}</td>
-                  <td>{product.sku}</td>
-                  <td>{product.price}</td>
-                  <td>
-                    {/*.....Actions here.........*/}
-                    <CustomEditIcon
-                      id={product.id}
-                      deletePressedFunc={updateDeleteConformationVisibility}
-                      editPressedFunc={editButtonPressed}
-                    />
-                    {/*....Actions End Here......*/}
-                  </td>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Product Name</label>
+                          <Field
+                            type="text"
+                            name="name"
+                            placeholder="Product Name"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Label</label>
+                          <Field
+                            type="text"
+                            name="label"
+                            placeholder="Label"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">SKU</label>
+                          <Field type="text" name="sku" placeholder="SKU" className="form-control form-control-lg" />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Category</label>
+                          <Field
+                            name="owner"
+                            component={FormikAutocomplete}
+                            label="Owner"
+                            options={allCategories}
+                            textFieldProps={{ fullWidth: true, margin: "normal", variant: "outlined" }}
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Product Cost</label>
+                          <Field type="number" name="price" placeholder="0" className="form-control form-control-lg" />
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
+                          <label className="form-custom-label">Default Sale Price</label>
+                          <Field
+                            type="number"
+                            name="defaultSalePrice"
+                            placeholder="0"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+                        <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
+                          <button
+                            style={{ width: "20%" }}
+                            className="btn btn-secondary btn-lg"
+                            type="button"
+                            onClick={updateAddProductFormVisibility}>
+                            Cancel
+                          </button>
+
+                          <button
+                            style={{ width: "20%", marginLeft: "30px" }}
+                            className="btn btn-primary btn-lg"
+                            type="submit">
+                            {productIdGoingTobeEdited > 0 ? "Edit Product" : "Add Product"}
+                          </button>
+                        </div>
+                      </div>
+                    </Form>
+                  </Formik>
+                </div>
+              </div>
+            </div>
+            <table className="table table-striped">
+              <thead className="thead-dark">
+                <tr>
+                  <th scope="col">Product Name</th>
+                  <th scope="col">Label</th>
+                  <th scope="col">sku</th>
+                  <th scope="col">price</th>
+                  <th scope="col">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      style={{ padding: "7px 4px" }}
+                      onClick={updateAddProductFormVisibility}>
+                      + Add Product
+                    </button>
+                  </th>
                 </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+
+              <tbody>
+                {allProductList &&
+                  allProductList.map((product, index) => (
+                    <tr key={index}>
+                      <td>{product.name}</td>
+                      <td>{product.label}</td>
+                      <td>{product.sku}</td>
+                      <td>{product.price}</td>
+                      <td>
+                        {/*.....Actions here.........*/}
+                        <CustomEditIcon
+                          id={product.id}
+                          deletePressedFunc={updateDeleteConformationVisibility}
+                          editPressedFunc={editButtonPressed}
+                        />
+                        {/*....Actions End Here......*/}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {!loggedIn && <AccessDenied />}
     </div>
   );
 }

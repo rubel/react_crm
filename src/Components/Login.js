@@ -1,21 +1,15 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
-export default function Login() {
+export default function Login({ toggle }) {
   const [uid, setUid] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState("");
   const [msg, setMsg] = useState("");
 
   let history = useNavigate();
-
-  useEffect(() => {
-    if (sessionStorage.getItem("uid")) {
-      history("/dashboard");
-    }
-  });
 
   const authenticateUser = async (e) => {
     e.preventDefault();
@@ -33,6 +27,9 @@ export default function Login() {
         sessionStorage.setItem("uid", uid);
         sessionStorage.setItem("fullUserDetails", JSON.stringify(res.data));
         setMsg("");
+
+        toggle();
+
         history("/dashboard");
       }
     } catch (error) {

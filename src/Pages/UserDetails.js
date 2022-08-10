@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
+import AccessDenied from "./AccessDenied";
 
 export default function UserDetails({ toggle }) {
   const [userdetails, setUserDetails] = useState({});
@@ -39,23 +40,31 @@ export default function UserDetails({ toggle }) {
     getUserDetails();
   }, []);
 
+  var loggedIn = sessionStorage.getItem("uid");
+
   return (
     <div>
-      <TopBar toggle={toggle} />
-      <Tabs />
-      UserDetails
-      <h2>{userdetails.id}</h2>
-      <h2>{userdetails.title}</h2>
-      <h2>{userdetails.firstname}</h2>
-      <h2>{userdetails.lastname}</h2>
-      <h2>{userdetails.email}</h2>
-      <h2>{userdetails.type}</h2>
-      <div>Permissions</div>
-      <ul>
-        {usersPermissions.map((p) => (
-          <li key={p}>{p}</li>
-        ))}
-      </ul>
+      {loggedIn && (
+        <div>
+          <TopBar toggle={toggle} />
+          <Tabs />
+          UserDetails
+          <h2>{userdetails.id}</h2>
+          <h2>{userdetails.title}</h2>
+          <h2>{userdetails.firstname}</h2>
+          <h2>{userdetails.lastname}</h2>
+          <h2>{userdetails.email}</h2>
+          <h2>{userdetails.type}</h2>
+          <div>Permissions</div>
+          <ul>
+            {usersPermissions.map((p) => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {!loggedIn && <AccessDenied />}
     </div>
   );
 }
