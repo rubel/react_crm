@@ -1,12 +1,17 @@
+import { Backdrop, Card } from "@mui/material";
+import MuiTextField from "@mui/material/TextField";
 import axios from "axios";
 import { Field, Form, Formik } from "formik";
+import { Autocomplete, TextField } from "formik-mui";
 import React, { useEffect, useState } from "react";
 import { BiPhone, BiRefresh, BiSearch, BiUser } from "react-icons/bi";
 import { BsFillPersonPlusFill } from "react-icons/bs";
 import { TiWarning } from "react-icons/ti";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import * as Yup from "yup";
 import "../App.css";
 import CustomEditIcon from "../Components/CustomEditIcon";
+import { SERVER_URL } from "../Constants/AppConstants";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied";
@@ -24,27 +29,6 @@ export default function Users({ toggle, type }) {
 
   const ALL_USER_TYPES = ["Admin", "Agent", "Deliverer", "Delivery Manager"];
 
-  /*
-  const data = [
-        { name: "Processed", orders: 400 },
-        { name: "Cancelled", orders: 400 },
-        { name: "N/A", orders: 300 },
-        { name: "Pending", orders: 200 },
-        { name: "Postponed", orders: 200 },
-        { name: "Unrady", orders: 300 },
-        { name: "Returned", orders: 300 },
-      ];
-
-  const COLORS = [
-    "forestgreen",
-    "red",
-    "blueviolet",
-    "rgb(204, 0, 153)",
-    "lightslategray",
-    "cornflowerblue",
-    "crimson",
-  ];*/
-
   useEffect(() => {
     getAllUsers();
     getAllCountryList();
@@ -55,6 +39,7 @@ export default function Users({ toggle, type }) {
   function deleteNavPressed(id) {
     console.log("going to delete user with id " + id);
     setSelectedUserId(id);
+    setSelectedUser(getUserDetailsForId(id));
     setDeleteConformationVisible(true);
   }
   function editNavPressed(id) {
@@ -75,7 +60,7 @@ export default function Users({ toggle, type }) {
 
   async function getAllOrdersFromAgent(id) {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllOrders",
         agentId: id,
         searchTerm: "",
@@ -125,7 +110,7 @@ export default function Users({ toggle, type }) {
   }
   async function getAllUsers(searchTerm = "") {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllUsers",
         searchTerm: searchTerm,
         type: type,
@@ -141,7 +126,7 @@ export default function Users({ toggle, type }) {
   }
   async function deleteTheUser() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "deleteTheUser",
 
         id: selectedUserId,
@@ -159,6 +144,7 @@ export default function Users({ toggle, type }) {
 
   function getInitialValuesForUser() {
     let details;
+
     if (selectedUserId >= 0) {
       details = {
         title: selectedUser.title,
@@ -170,7 +156,7 @@ export default function Users({ toggle, type }) {
         permitted_country: selectedUser.permitted_country.split(","),
         password: "",
         confirmPassword: "",
-        userType: selectedUser.type,
+        userTypeField: selectedUser.type,
         perms: selectedUser.perms,
       };
     } else {
@@ -184,7 +170,7 @@ export default function Users({ toggle, type }) {
         permitted_country: [],
         password: "",
         confirmPassword: "",
-        userType: "",
+        userTypeField: "",
         perms: [],
       };
     }
@@ -192,12 +178,15 @@ export default function Users({ toggle, type }) {
   }
   async function getAllCountryList() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllCountries",
       });
 
       if (res.data) {
-        setAllCountries(res.data);
+        let countries = res.data.map((val) => {
+          return val.country;
+        });
+        setAllCountries(countries);
       }
     } catch (error) {
       console.log(error);
@@ -239,7 +228,7 @@ export default function Users({ toggle, type }) {
     console.log("searchOrdersForAgents");
     console.log(values);
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllOrders",
         start_date: values.start_date,
         end_date: values.end_date,
@@ -257,25 +246,40 @@ export default function Users({ toggle, type }) {
       console.log(error);
     }
   }
-  async function submitForm(formData) {
-    console.log(formData);
-    console.log(JSON.stringify(formData));
+  async function submitForm(formData, resetFormFunc) {
     formData.uid = selectedUserId;
+    console.log(formData);
+
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: selectedUserId >= 0 ? "editUserDetails" : "registerUser",
         formData: JSON.stringify(formData),
       });
 
-      console.log(res);
       if (res.data.includes("success")) {
         setAddUserFormVisible(false);
+        setSelectedUserId(-100);
+        resetFormFunc(getInitialValuesForUser());
         getAllUsers();
       }
     } catch (error) {
       console.log(error);
     }
   }
+  const phoneRegExp =
+    /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+  const SignupSchema = Yup.object().shape({
+    title: Yup.string().required("Required"),
+    firstName: Yup.string().min(2, "Too Short!").max(50, "Too Long!").required("Required"),
+    phone: Yup.string().required("Enter Phone Number").matches(phoneRegExp, "Phone number is not valid"),
+    userTypeField: Yup.string().required("Required"),
+    lastName: Yup.string().min(2, "Too Short!").max(50, "Too Long!").required("Required"),
+    userid: Yup.string().min(2, "Too Short!").max(50, "Too Long!").required("Required"),
+    email: Yup.string().email("Invalid email").required("Required"),
+    password: Yup.string().min(6, "Too Short!").max(12, "Too Long!").required("Enter password"),
+    confirmPassword: Yup.string().oneOf([Yup.ref("password"), null], "Passwords must match"),
+  });
+
   var loggedIn = sessionStorage.getItem("uid");
 
   return (
@@ -286,7 +290,12 @@ export default function Users({ toggle, type }) {
           <Tabs />
           <div className="container-fluid">
             {/*........................agent profile..............................*/}
-            <div className="fullShadow" style={showAgentProfileVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                overflowY: "scroll",
+              }}
+              open={showAgentProfileVisible}>
               <div className="agentProfilePage">
                 <div style={{ height: "50px" }}>
                   <h5 style={{ float: "left" }}>
@@ -468,10 +477,15 @@ export default function Users({ toggle, type }) {
                   </table>
                 </div>
               </div>
-            </div>
+            </Backdrop>
 
             {/*........................delete user..............................*/}
-            <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                overflowY: "scroll",
+              }}
+              open={deleteConformationVisible}>
               <div className="deleteOrderConfirmBg">
                 <div>
                   <h4>Warning</h4>
@@ -502,15 +516,19 @@ export default function Users({ toggle, type }) {
                   </button>
                 </div>
               </div>
-            </div>
+            </Backdrop>
             {/*..........................add user................................*/}
-            <div className="fullShadow" style={addUserFormVisible ? { display: "block" } : { display: "none" }}>
-              <div className="addUserFormBg">
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={addUserFormVisible}>
+              <Card className="addUserFormBg">
                 <Formik
                   enableReinitialize
+                  validationSchema={SignupSchema}
                   initialValues={getInitialValuesForUser()}
-                  onSubmit={(values) => {
-                    submitForm(values);
+                  onSubmit={(values, { resetForm }) => {
+                    console.log("should submit the form..");
+                    submitForm(values, resetForm);
                   }}>
                   <Form>
                     <div style={{ width: "100%", height: "570px" }}>
@@ -521,130 +539,190 @@ export default function Users({ toggle, type }) {
                           </p>
                         </div>
                         {/*................title......................*/}
-                        <div className="form-outline" style={{ width: "20%", float: "left", paddingRight: "1%" }}>
-                          <label className="form-custom-label">Title: </label>
-                          <Field as="select" name="title" className="select form-control-lg" style={{ width: "100%" }}>
-                            <option value="mr.">Mr.</option>
-                            <option value="mrs.">Mrs.</option>
-                          </Field>
-                        </div>
+                        <div style={{ margin: "10px 0px" }}>
+                          <div className="form-outline" style={{ width: "20%", float: "left", paddingRight: "1%" }}>
+                            <Field
+                              name="title"
+                              component={Autocomplete}
+                              options={["Mr.", "Mrs."]}
+                              style={{ width: "100%" }}
+                              renderInput={(params) => {
+                                const inputProps = params.inputProps;
+                                inputProps.autoComplete = "disabled";
+                                return (
+                                  <MuiTextField
+                                    {...params}
+                                    inputProps={inputProps}
+                                    name="title"
+                                    label="Title"
+                                    variant="outlined"
+                                    fullWidth
+                                    required
+                                  />
+                                );
+                              }}
+                            />
+                          </div>
 
-                        <div className="form-outline" style={{ width: "40%", float: "left", paddingRight: "1%" }}>
-                          <label className="form-custom-label">First Name</label>
+                          <div
+                            className="form-outline"
+                            style={{
+                              width: "40%",
+                              float: "left",
+                              paddingRight: "1%",
+                            }}>
+                            <Field
+                              type="text"
+                              component={TextField}
+                              name="firstName"
+                              required
+                              autoComplete="disabled"
+                              label="First Name"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
+
+                          <div className="form-outline" style={{ width: "40%", float: "left" }}>
+                            <Field
+                              type="text"
+                              required
+                              component={TextField}
+                              name="lastName"
+                              autoComplete="disabled"
+                              label="Last Name"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
+                        </div>
+                        <div
+                          className="form-outline"
+                          style={{
+                            marginTop: "10px",
+                            float: "left",
+                            width: "100%",
+                            marginBottom: "10px",
+                          }}>
                           <Field
                             type="text"
-                            name="firstName"
-                            placeholder="First Name"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
-
-                        <div className="form-outline" style={{ width: "40%", float: "left" }}>
-                          <label className="form-custom-label">Last Name</label>
-                          <Field
-                            type="text"
-                            name="lastName"
-                            placeholder="Last Name"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
-
-                        <div className="form-outline">
-                          <label className="form-custom-label">{type == "all" ? "User id" : "Agent User ID"}</label>
-                          <Field
-                            type="text"
+                            required
+                            component={TextField}
                             name="userid"
-                            disabled={selectedUserId >= 0}
-                            placeholder="User Id"
+                            autoComplete="disabled"
+                            label="User Id"
                             className="form-control form-control-lg"
                           />
                         </div>
-                        <div className="form-outline">
-                          <label className="form-custom-label">Phone</label>
+
+                        <div className="form-outline" style={{ paddingTop: "10px" }}>
                           <Field
                             type="text"
+                            required
+                            component={TextField}
                             name="phone"
-                            placeholder="User Id"
+                            autoComplete="disabled"
+                            label="Phone"
                             className="form-control form-control-lg"
                           />
                         </div>
 
                         {type == "all" && (
-                          <div className="form-outline">
-                            <label className="form-custom-label">User Type: </label>
+                          <div className="form-outline" style={{ paddingTop: "10px" }}>
                             <Field
-                              as="select"
-                              name="userType"
-                              className="select form-control-lg"
-                              style={{ width: "100%" }}>
-                              {ALL_USER_TYPES &&
-                                ALL_USER_TYPES.map((ut, index) => (
-                                  <option key={index} value={ut}>
-                                    {ut}
-                                  </option>
-                                ))}
-                            </Field>
+                              name="userTypeField"
+                              component={Autocomplete}
+                              options={ALL_USER_TYPES}
+                              style={{ width: "100%" }}
+                              renderInput={(params) => {
+                                const inputProps = params.inputProps;
+                                inputProps.autoComplete = "disabled";
+                                return (
+                                  <MuiTextField
+                                    {...params}
+                                    inputProps={inputProps}
+                                    name="userTypeField"
+                                    label="User Type"
+                                    variant="outlined"
+                                    required
+                                    fullWidth
+                                  />
+                                );
+                              }}
+                            />
                           </div>
                         )}
 
                         {type == "agent" && (
-                          <div className="form-outline">
-                            <label className="form-custom-label">User Type</label>
+                          <div className="form-outline" style={{ paddingTop: "10px" }}>
                             <Field
                               type="text"
-                              disabled
+                              component={TextField}
                               name="userType"
-                              placeholder="Agent"
+                              disabled
+                              value={"Agent"}
+                              autoComplete="disabled"
+                              label="User Type"
                               className="form-control form-control-lg"
                             />
                           </div>
                         )}
 
-                        <div className="form-outline">
-                          <label className="form-custom-label">e-mail</label>
+                        <div className="form-outline" style={{ paddingTop: "10px" }}>
                           <Field
-                            type="text"
+                            type="email"
+                            required
+                            component={TextField}
                             name="email"
-                            placeholder="email"
+                            autoComplete="disabled"
+                            label="eMail"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline">
-                          <label className="form-custom-label">Password</label>
+                        <div className="form-outline" style={{ paddingTop: "10px" }}>
                           <Field
                             type="password"
+                            required
+                            component={TextField}
                             name="password"
-                            placeholder=""
+                            autoComplete="disabled"
+                            label="Password"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline">
-                          <label className="form-custom-label">Confirm Password</label>
+                        <div className="form-outline" style={{ paddingTop: "10px" }}>
                           <Field
                             type="password"
+                            component={TextField}
                             name="confirmPassword"
-                            placeholder=""
+                            autoComplete="disabled"
+                            label="Confirm Password"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline">
-                          <label className="form-custom-label">Allowed Countries: </label>
+                        <div className="form-outline" style={{ paddingTop: "10px" }}>
                           <Field
-                            as="select"
-                            multiple
                             name="permitted_country"
-                            className="select form-control-lg"
-                            style={{ width: "100%", height: "80px" }}>
-                            {allCountries &&
-                              allCountries.map((c, index) => (
-                                <option key={index} value={c.country}>
-                                  {c.country}
-                                </option>
-                              ))}
-                          </Field>
+                            component={Autocomplete}
+                            options={allCountries}
+                            multiple
+                            style={{ width: "100%" }}
+                            renderInput={(params) => {
+                              const inputProps = params.inputProps;
+                              inputProps.autoComplete = "disabled";
+                              return (
+                                <MuiTextField
+                                  {...params}
+                                  inputProps={inputProps}
+                                  name="permitted_country"
+                                  label="Allowed Countries: "
+                                  variant="outlined"
+                                  fullWidth
+                                />
+                              );
+                            }}
+                          />
                         </div>
                       </div>
 
@@ -665,7 +743,7 @@ export default function Users({ toggle, type }) {
                               </div>
                             ))}
                         </div>
-                        <div style={{ width: "100%", float: "right", marginTop: "27px" }}>
+                        <div style={{ width: "100%", float: "right", marginTop: "19px" }}>
                           <button
                             style={{ width: "47%", float: "left" }}
                             className="btn btn-secondary btn-lg"
@@ -686,8 +764,9 @@ export default function Users({ toggle, type }) {
                     </div>
                   </Form>
                 </Formik>
-              </div>
-            </div>
+              </Card>
+            </Backdrop>
+
             <table className="table table-striped">
               <thead className="thead-dark">
                 <tr>

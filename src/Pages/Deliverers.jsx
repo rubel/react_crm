@@ -1,7 +1,11 @@
+import { Backdrop } from "@mui/material";
+import MuiTextField from "@mui/material/TextField";
 import axios from "axios";
 import { Field, Form, Formik } from "formik";
+import { Autocomplete, TextField } from "formik-mui";
 import React, { useEffect, useState } from "react";
 import { BiPhone, BiSearch, BiUser } from "react-icons/bi";
+import * as Yup from "yup";
 import AddedCityToDelivererRow from "../Components/AddedCityToDelivererRow";
 import CustomEditIcon from "../Components/CustomEditIcon";
 import Tabs from "../MainApp/Tabs";
@@ -78,7 +82,10 @@ function Deliverers({ toggle, type }) {
       });
 
       if (res.data) {
-        setAllCities(res.data);
+        let cities = res.data.map((val) => {
+          return val.city;
+        });
+        setAllCities(cities);
         setCityDetailsForSelectedDeliverer({ cities: [res.data[0].city], del_costs: [0], return_costs: [0] });
       }
     } catch (error) {
@@ -109,7 +116,10 @@ function Deliverers({ toggle, type }) {
       });
 
       if (res.data) {
-        setAllCountries(res.data);
+        let countries = res.data.map((val) => {
+          return val.country;
+        });
+        setAllCountries(countries);
       }
     } catch (error) {
       console.log(error);
@@ -226,8 +236,8 @@ function Deliverers({ toggle, type }) {
     let assignedReturnCosts = cityDetailsForSelectedDeliverer.return_costs;
 
     for (let i = 0; i < allCities.length; i++) {
-      if (assignedCities.indexOf(allCities[i].city) == -1) {
-        assignedCities.push(allCities[i].city);
+      if (assignedCities.indexOf(allCities[i]) == -1) {
+        assignedCities.push(allCities[i]);
         assignedDelCosts.push(0);
         assignedReturnCosts.push(0);
       }
@@ -355,6 +365,30 @@ function Deliverers({ toggle, type }) {
       console.log(error);
     }
   }
+
+  const phoneRegExp =
+    /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+  let validationSchema = Yup.object().shape({
+    name: Yup.string().required("Required").min(3, "Minimum 3 chars").max(50, "Max 50 chars"),
+    user_id: Yup.string().required("Required").min(3, "Minimum 3 chars").max(50, "Max 50 chars"),
+    email: Yup.string().email("Invalid email").required("Required"),
+    password: Yup.string().min(6, "Too Short!").max(12, "Too Long!").required("Enter password"),
+    password_again: Yup.string().oneOf([Yup.ref("password"), null], "Passwords must match"),
+    phone: Yup.string().required("Enter Phone Number").matches(phoneRegExp, "Phone number is not valid"),
+    whatsapp: Yup.string().required("Enter Phone Number").matches(phoneRegExp, "Phone number is not valid"),
+    defaultShippingCost: Yup.number("Must be Number").required("Enter Default Shipping Cost"),
+    stockAlert: Yup.number("Must be Number").required("Enter Default Shipping Cost"),
+  });
+
+  let shippingCompanyValidationSchema = Yup.object().shape({
+    name: Yup.string().required("Required").min(3, "Minimum 3 chars").max(50, "Max 50 chars"),
+    email: Yup.string().email("Invalid email").required("Required"),
+    phone: Yup.string().required("Enter Phone Number").matches(phoneRegExp, "Phone number is not valid"),
+    whatsapp: Yup.string().required("Enter Phone Number").matches(phoneRegExp, "Phone number is not valid"),
+    defaultShippingCost: Yup.number("Must be Number").required("Enter Default Shipping Cost"),
+    stockAlert: Yup.number("Must be Number").required("Enter Default Shipping Cost"),
+  });
+
   useEffect(() => {
     getAllDelivererList();
     getAllCountryList();
@@ -371,7 +405,9 @@ function Deliverers({ toggle, type }) {
           <Tabs />
           <div className="container-fluid">
             {/*....delete conformation.....*/}
-            <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={deleteConformationVisible}>
               <div className="deleteConformationBg">
                 <div>
                   <h4>Warning</h4>
@@ -397,10 +433,12 @@ function Deliverers({ toggle, type }) {
                   </button>
                 </div>
               </div>
-            </div>
+            </Backdrop>
 
             {/*....add city.....*/}
-            <div className="fullShadow" style={addCityFormVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={addCityFormVisible}>
               <div className="cityFormBg">
                 <div style={{ padding: "0px 10px" }}>
                   <div style={{ marginBottom: "18px" }}>
@@ -420,40 +458,47 @@ function Deliverers({ toggle, type }) {
                         {/*................title......................*/}
 
                         <div className="form-outline" style={{ padding: "0px 10px" }}>
-                          <label className="form-custom-label">Category Name</label>
-                          <Field type="text" name="city" placeholder="City" className="form-control form-control-lg" />
+                          <Field
+                            type="text"
+                            component={TextField}
+                            name="city"
+                            autoComplete="disabled"
+                            required
+                            label="City"
+                            className="form-control form-control-lg"
+                          />
                         </div>
+                      </div>
 
-                        <div style={{ float: "right", width: "100%", padding: "12px 10px 3px 10px" }}>
-                          <button
-                            style={{ width: "40%" }}
-                            className="btn btn-secondary btn-lg"
-                            type="button"
-                            onClick={() => {
-                              setAddCityFormVisible(false);
-                              setAssignCityToDelivererFormVisible(true);
-                            }}>
-                            Cancel
-                          </button>
+                      <div style={{ float: "right", width: "100%", padding: "12px 10px 3px 10px" }}>
+                        <button
+                          style={{ width: "40%" }}
+                          className="btn btn-secondary btn-lg"
+                          type="button"
+                          onClick={() => {
+                            setAddCityFormVisible(false);
+                            setAssignCityToDelivererFormVisible(true);
+                          }}>
+                          Cancel
+                        </button>
 
-                          <button
-                            style={{ width: "40%", marginLeft: "30px" }}
-                            className="btn btn-primary btn-lg"
-                            type="submit">
-                            Add City
-                          </button>
-                        </div>
+                        <button
+                          style={{ width: "40%", marginLeft: "30px" }}
+                          className="btn btn-primary btn-lg"
+                          type="submit">
+                          Add City
+                        </button>
                       </div>
                     </Form>
                   </Formik>
                 </div>
               </div>
-            </div>
+            </Backdrop>
 
             {/*....assign city form .....*/}
-            <div
-              className="fullShadow"
-              style={assignCityToDelivererFormVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={assignCityToDelivererFormVisible}>
               <div className="assignCityToDelivererBg">
                 <div>
                   <div style={{ float: "left", width: "70%" }}>
@@ -562,9 +607,14 @@ function Deliverers({ toggle, type }) {
                   </Formik>
                 </div>
               </div>
-            </div>
+            </Backdrop>
             {/*.......add Deliverer form here....... */}
-            <div className="fullShadow" style={addDelivererVisible ? { display: "block" } : { display: "none" }}>
+            <Backdrop
+              sx={{
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                overflowY: "scroll",
+              }}
+              open={addDelivererVisible}>
               <div className="delivererFormBg">
                 <div style={{ padding: "0px 10px" }}>
                   <div>
@@ -575,172 +625,211 @@ function Deliverers({ toggle, type }) {
                   <Formik
                     initialValues={getAddDelivererInitialValues()}
                     enableReinitialize
+                    validationSchema={validationSchema}
                     onSubmit={(values) => {
                       addEditDeliverer(values);
                     }}>
                     <Form>
                       <div className="newDelivererForm">
                         {/*................title......................*/}
+                        <div style={{ height: "100px" }}>
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              type="text"
+                              component={TextField}
+                              name="name"
+                              autoComplete="disabled"
+                              label={type == "company" ? "Company Name" : "Deliverer Name"}
+                              className="form-control form-control-lg"
+                            />
+                          </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">
-                            {type == "company" ? "Company Name" : "Deliverer Name"}
-                          </label>
-                          <Field
-                            type="text"
-                            name="name"
-                            placeholder="Deliverer Name"
-                            className="form-control form-control-lg"
-                          />
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              type="text"
+                              component={TextField}
+                              name="user_id"
+                              autoComplete="disabled"
+                              label="Login Id"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
                         </div>
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Login ID</label>
-                          <Field
-                            type="text"
-                            name="user_id"
-                            placeholder="Deliverer Name"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
+                        <div style={{ height: "100px" }}>
+                          <div className="form-outline" style={{ width: "25%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              name="country"
+                              component={Autocomplete}
+                              options={allCountries}
+                              style={{ width: "100%" }}
+                              getOptionLabel={(option) => option || ""}
+                              renderInput={(params) => {
+                                const inputProps = params.inputProps;
+                                inputProps.autoComplete = "disabled";
+                                return (
+                                  <MuiTextField
+                                    {...params}
+                                    inputProps={inputProps}
+                                    name="country"
+                                    label="Country"
+                                    variant="outlined"
+                                    fullWidth
+                                  />
+                                );
+                              }}
+                            />
+                          </div>
 
-                        <div className="form-outline" style={{ width: "25%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Country: </label>
-                          <Field
-                            as="select"
-                            name="country"
-                            className="select form-control-lg"
-                            style={{ width: "100%" }}>
-                            {allCountries &&
-                              allCountries.map((c, index) => (
-                                <option key={index} value={c.country}>
-                                  {c.country}
-                                </option>
-                              ))}
-                          </Field>
+                          <div className="form-outline" style={{ width: "25%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              name="city"
+                              component={Autocomplete}
+                              options={allCities}
+                              style={{ width: "100%" }}
+                              getOptionLabel={(option) => option || ""}
+                              renderInput={(params) => {
+                                const inputProps = params.inputProps;
+                                inputProps.autoComplete = "disabled";
+                                return (
+                                  <MuiTextField
+                                    {...params}
+                                    inputProps={inputProps}
+                                    name="city"
+                                    label="City"
+                                    variant="outlined"
+                                    fullWidth
+                                  />
+                                );
+                              }}
+                            />
+                          </div>
+                          <div className="form-outline" style={{ width: "50%", float: "right", padding: "10px 10px" }}>
+                            <Field
+                              type="email"
+                              component={TextField}
+                              name="email"
+                              required
+                              autoComplete="disabled"
+                              label="email"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
                         </div>
-                        <div className="form-outline" style={{ width: "25%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">City</label>
-                          <Field as="select" name="city" className="select form-control-lg" style={{ width: "100%" }}>
-                            {allCities &&
-                              allCities.map((c, index) => (
-                                <option key={index} value={c.city}>
-                                  {c.city}
-                                </option>
-                              ))}
-                          </Field>
-                        </div>
-                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                          <label className="form-custom-label">e-Mail</label>
-                          <Field
-                            type="email"
-                            name="email"
-                            placeholder="email"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
+                        <div style={{ height: "100px" }}>
+                          <div className="form-outline" style={{ width: "50%", float: "right", padding: "10px 10px" }}>
+                            <Field
+                              type="text"
+                              component={TextField}
+                              name="phone"
+                              required
+                              autoComplete="disabled"
+                              label="Phone"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Phone</label>
-                          <Field
-                            type="text"
-                            name="phone"
-                            placeholder="Phone"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
-
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Whatsapp</label>
-                          <Field
-                            type="text"
-                            name="whatsapp"
-                            placeholder="WhatsApp"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Password</label>
-                          <Field
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Password Again</label>
-                          <Field
-                            type="password"
-                            name="password_again"
-                            placeholder="Password Again"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
-
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label" style={{ width: "100%" }}>
-                            Status
-                          </label>
-                          <div
-                            style={{
-                              border: "1px solid lightgray",
-                              borderRadius: "4px",
-                              minHeight: "42px",
-                              padding: "3px 12px",
-                            }}>
-                            <div style={{ float: "left", paddingTop: "4px" }}>Inactive</div>
-                            <div style={{ float: "left", margin: "0px 20px" }}>
-                              <label className="switch">
-                                <input type="checkbox" id="isActive" name="isActive" />
-                                <span className="slider round"></span>
-                              </label>
-                            </div>
-                            <div style={{ float: "left", paddingTop: "4px" }}>Active</div>
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              type="text"
+                              component={TextField}
+                              name="whatsapp"
+                              required
+                              autoComplete="disabled"
+                              label="WhatsApp"
+                              className="form-control form-control-lg"
+                            />
                           </div>
                         </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label" style={{ width: "100%" }}>
-                            Set shipping cost
-                          </label>
-                          <div
-                            style={{
-                              border: "1px solid lightgray",
-                              borderRadius: "4px",
-                              minHeight: "42px",
-                              padding: "3px 12px",
-                            }}>
-                            <div style={{ float: "left", paddingTop: "4px" }}>Manual</div>
-                            <div style={{ float: "left", margin: "0px 20px" }}>
-                              <label className="switch">
-                                <input type="checkbox" id="shippingAuto" name="shippingAuto" />
-                                <span className="slider round"></span>
-                              </label>
-                            </div>
-                            <div style={{ float: "left", paddingTop: "4px" }}>Automatic</div>
+                        <div style={{ height: "100px" }}>
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              type="password"
+                              component={TextField}
+                              name="password"
+                              autoComplete="disabled"
+                              label="Password"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              type="password"
+                              component={TextField}
+                              name="password_again"
+                              autoComplete="disabled"
+                              label="Password Again"
+                              className="form-control form-control-lg"
+                            />
                           </div>
                         </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Default shipping cost (DH)</label>
+                        <div style={{ height: "60px" }}>
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <div
+                              style={{
+                                border: "1px solid lightgray",
+                                borderRadius: "4px",
+                                minHeight: "42px",
+                                padding: "3px 12px",
+                              }}>
+                              <div style={{ float: "left", paddingTop: "4px" }}>
+                                <b style={{ paddingRight: "12px" }}>Status:</b> Inactive
+                              </div>
+                              <div style={{ float: "left", margin: "0px 20px" }}>
+                                <label className="switch">
+                                  <input type="checkbox" id="isActive" name="isActive" />
+                                  <span className="slider round"></span>
+                                </label>
+                              </div>
+                              <div style={{ float: "left", paddingTop: "4px" }}>Active</div>
+                            </div>
+                          </div>
+
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <div
+                              style={{
+                                border: "1px solid lightgray",
+                                borderRadius: "4px",
+                                minHeight: "42px",
+                                padding: "3px 12px",
+                              }}>
+                              <div style={{ float: "left", paddingTop: "4px" }}>
+                                <b style={{ paddingRight: "12px" }}>Shipping cost: </b> Manual
+                              </div>
+                              <div style={{ float: "left", margin: "0px 20px" }}>
+                                <label className="switch">
+                                  <input type="checkbox" id="shippingAuto" name="shippingAuto" />
+                                  <span className="slider round"></span>
+                                </label>
+                              </div>
+                              <div style={{ float: "left", paddingTop: "4px" }}>Automatic</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
                           <Field
                             type="number"
+                            component={TextField}
                             name="defaultShippingCost"
-                            placeholder="0"
+                            autoComplete="disabled"
+                            label="Default Shipping Cost (DH)"
                             className="form-control form-control-lg"
                           />
                         </div>
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Stock Alert</label>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
                           <Field
                             type="number"
+                            component={TextField}
                             name="stockAlert"
-                            placeholder="0"
+                            autoComplete="disabled"
+                            label="Stock Alert"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
+                        <div style={{ float: "right", width: "100%", padding: "12px 10px 3px 10px" }}>
                           <button
                             style={{ width: "20%" }}
                             className="btn btn-secondary btn-lg"
@@ -763,12 +852,14 @@ function Deliverers({ toggle, type }) {
                   </Formik>
                 </div>
               </div>
-            </div>
+            </Backdrop>
 
             {/*.......add shipping company form here....... */}
-            <div className="fullShadow" style={addShippingCompanyVisible ? { display: "block" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={addShippingCompanyVisible}>
               <div className="shippingFormBg">
-                <div style={{ padding: "0px 10px" }}>
+                <div style={{ padding: "10px 10px" }}>
                   <div>
                     <h2>Create New Shipping Company</h2>
                   </div>
@@ -777,70 +868,81 @@ function Deliverers({ toggle, type }) {
                   <Formik
                     initialValues={getAddShippingCompanyInitialValues()}
                     enableReinitialize
+                    validationSchema={shippingCompanyValidationSchema}
                     onSubmit={(values) => {
                       addEditShippingCompany(values);
                     }}>
                     <Form>
                       <div className="newDelivererForm">
                         {/*................title......................*/}
+                        <div style={{ height: "100px" }}>
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              type="text"
+                              component={TextField}
+                              name="name"
+                              autoComplete="disabled"
+                              label="Company Name"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Company Name</label>
-                          <Field
-                            type="text"
-                            name="name"
-                            placeholder="Company Name"
-                            className="form-control form-control-lg"
-                          />
+                          <div className="form-outline" style={{ width: "50%", float: "right", padding: "10px 10px" }}>
+                            <Field
+                              type="email"
+                              component={TextField}
+                              name="email"
+                              autoComplete="disabled"
+                              label="email"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
                         </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                          <label className="form-custom-label">e-Mail</label>
-                          <Field
-                            type="email"
-                            name="email"
-                            placeholder="email"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
+                        <div style={{ height: "100px" }}>
+                          <div className="form-outline" style={{ width: "50%", float: "right", padding: "10px 10px" }}>
+                            <Field
+                              type="text"
+                              component={TextField}
+                              name="phone"
+                              autoComplete="disabled"
+                              label="Phone"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Phone</label>
-                          <Field
-                            type="text"
-                            name="phone"
-                            placeholder="Phone"
-                            className="form-control form-control-lg"
-                          />
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              type="text"
+                              component={TextField}
+                              name="whatsapp"
+                              autoComplete="disabled"
+                              label="WhatsApp"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
                         </div>
-
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Whatsapp</label>
-                          <Field
-                            type="text"
-                            name="whatsapp"
-                            placeholder="WhatsApp"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
-
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Default shipping cost (DH)</label>
-                          <Field
-                            type="number"
-                            name="defaultShippingCost"
-                            placeholder="0"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Stock Alert</label>
-                          <Field
-                            type="number"
-                            name="stockAlert"
-                            placeholder="0"
-                            className="form-control form-control-lg"
-                          />
+                        <div style={{ height: "100px" }}>
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              type="number"
+                              component={TextField}
+                              name="defaultShippingCost"
+                              autoComplete="disabled"
+                              label="Default shipping cost (DH)"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              type="number"
+                              component={TextField}
+                              name="stockAlert"
+                              autoComplete="disabled"
+                              label="Stock Alert"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
                         </div>
 
                         <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
@@ -866,7 +968,7 @@ function Deliverers({ toggle, type }) {
                   </Formik>
                 </div>
               </div>
-            </div>
+            </Backdrop>
 
             {/* .......list all deliverers or companies...... */}
 

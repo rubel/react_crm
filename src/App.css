@@ -52,7 +52,7 @@ main {
   padding: 0px;
   text-align: right;
   font-size: 20px;
-  margin-bottom: 46px;
+  margin-bottom: 26px;
 }
 .permission-legend2 {
   height: 40px;
@@ -60,7 +60,7 @@ main {
   padding: 0px;
   text-align: right;
   font-size: 20px;
-  margin-bottom: 46px;
+  margin-bottom: 26px;
 }
 .details-legend {
   height: 40px;
@@ -81,7 +81,7 @@ main {
 }
 .permission-checkbox {
   width: 50%;
-  padding: 0px 10px 6px 10px;
+  padding: 0px 10px 5px 10px;
   float: left;
   font-size: 20px;
 }
@@ -161,11 +161,11 @@ main {
 
 .sidebar {
   color: white;
-  height: 100;
+  height: auto;
   width: 240px;
   overflow-y: auto;
   background-color: #1e1e2d;
-  padding-bottom: 20%;
+  padding-bottom: 5%;
 }
 
 .top_section {
@@ -265,22 +265,25 @@ main {
   left: 0px;
   top: 0px;
   width: 100vw;
-  height: 100vh;
+  height: auto;
   background: rgba(0, 0, 0, 0.2);
+  padding-bottom: 5%;
+  overflow-y: auto;
 }
+
 .productFormBg {
   width: 1000px;
-  height: 400px;
+  height: auto;
   background: white;
-  margin: 100px auto;
+  margin: auto;
   padding: 20px 30px;
   box-shadow: 10px 10px 5px #aaaaaa;
 }
 .warehouseFormBg {
   width: 800px;
-  height: 400px;
+  height: auto;
   background: white;
-  margin: 100px auto 0px auto;
+  margin: auto;
   padding: 20px 30px;
   box-shadow: 10px 10px 5px #aaaaaa;
 }
@@ -310,10 +313,10 @@ main {
 }
 .changeStatusFormBg {
   width: 800px;
-  height: 380px;
+  height: auto;
   background: white;
   float: right;
-  margin: 100px auto 100px auto;
+  margin: auto;
   padding: 20px 30px;
   box-shadow: 10px 10px 5px #aaaaaa;
 }
@@ -355,7 +358,7 @@ main {
   height: 280px;
   background: white;
   float: right;
-  margin: 100px auto 100px auto;
+  margin: auto;
   padding: 20px 30px;
   box-shadow: 10px 10px 5px #aaaaaa;
 }
@@ -364,7 +367,7 @@ main {
   height: auto;
   background: white;
   float: right;
-  margin: 80px auto auto auto;
+  margin: auto;
   padding: 20px 30px;
   box-shadow: 10px 10px 5px #aaaaaa;
 }
@@ -397,7 +400,7 @@ main {
 }
 .categoryFormBg {
   width: 600px;
-  height: 250px;
+  height: 230px;
   background: white;
   margin: auto;
   align-items: center;
@@ -406,7 +409,7 @@ main {
 }
 .cityFormBg {
   width: 600px;
-  height: 250px;
+  height: auto;
   background: white;
   margin: auto;
   align-items: center;
@@ -428,7 +431,7 @@ main {
 }
 .customerFormBg {
   width: 1000px;
-  height: 520px;
+  height: auto;
   background: white;
   float: right;
   margin: 100px 100px 0px 0px;
@@ -437,25 +440,43 @@ main {
 }
 .supplierFormBg {
   width: 1000px;
-  height: 520px;
+  height: auto;
   background: white;
   float: right;
-  margin: 100px 100px 0px 0px;
+  margin: auto;
   padding: 20px 30px;
   box-shadow: 10px 10px 5px #aaaaaa;
 }
 .delivererFormBg {
   width: 1000px;
-  height: 600px;
+  height: auto;
   background: white;
   float: right;
-  margin: 60px 100px 0px 0px;
+  margin: auto;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.expenceSheetFormBg {
+  width: 800px;
+  height: auto;
+  background: white;
+  float: right;
+  margin: auto;
+  padding: 20px 30px;
+  box-shadow: 10px 10px 5px #aaaaaa;
+}
+.addTransactionFormBg {
+  width: 800px;
+  height: auto;
+  background: white;
+  float: right;
+  margin: auto;
   padding: 20px 30px;
   box-shadow: 10px 10px 5px #aaaaaa;
 }
 .productSheetFormBg {
   width: 1000px;
-  height: 650px;
+  height: auto;
   background: white;
   float: right;
   margin: auto auto;
@@ -474,10 +495,10 @@ main {
 }
 .shippingFormBg {
   width: 1000px;
-  height: 380px;
+  height: auto;
   background: white;
   float: right;
-  margin: 60px 100px 0px 0px;
+  margin: auto;
   padding: 20px 30px;
   box-shadow: 10px 10px 5px #aaaaaa;
 }
@@ -519,9 +540,9 @@ main {
 }
 .addUserFormBg {
   width: 90%;
-  height: 670px;
+  height: auto;
   background: white;
-  margin: 30px auto;
+  margin: auto;
   align-items: center;
   padding: 20px 30px;
   box-shadow: 10px 10px 5px #aaaaaa;

@@ -16,7 +16,7 @@ import ProductsSheet from "./Pages/ProductsSheet";
 import SalesChannels from "./Pages/SalesChannels";
 import Shipping from "./Pages/Shipping";
 import Suppliers from "./Pages/Suppliers";
-import Supply from "./Pages/Supply";
+import Transactions from "./Pages/Transactions";
 import UserDetails from "./Pages/UserDetails";
 import Users from "./Pages/Users";
 import Warehouses from "./Pages/Warehouses";
@@ -100,7 +100,7 @@ function App() {
             <Route path="/shipping/deliverers" element={<Deliverers type="individual" toggle={toggle} />} />
             <Route path="/shipping/companies" element={<Deliverers type="company" toggle={toggle} />} />
             <Route path="/inventory" element={<Inventory toggle={toggle} />} />
-            <Route path="/supply" element={<Supply toggle={toggle} />} />
+            <Route path="/supply/transactions" element={<Transactions toggle={toggle} />} />
             <Route path="/supply/suppliers" element={<Suppliers toggle={toggle} />} />
             <Route path="/expense/business_expence" element={<Expense type="business" toggle={toggle} />} />
             <Route path="/expense/team_expence" element={<Expense type="team" toggle={toggle} />} />

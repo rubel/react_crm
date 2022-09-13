@@ -1,71 +1,86 @@
-import { Field } from "formik";
 import React from "react";
 
-export default function ProductRowInOrder({ allProductList, product_index, selectedProduct, subtotal }) {
-  function productSelected(itemId, qty) {
-    for (let i = 0; i < allProductList.length; i++) {
-      if (allProductList[i].id == itemId) {
-        let subtotal = allProductList[i].price * qty;
-        document.getElementById("subtotal[" + product_index + "]").innerHTML = subtotal;
-        break;
-      }
-    }
-  }
+export default function ProductRowInOrder({
+  removeAddedProductForTheOrder,
+  productUpdatedForOrder,
+  index,
+  selectedProduct,
+  allProducts,
+  quantity,
+  subtotal,
+}) {
   return (
-    <div
-      style={{ marginBottom: "6px" }}
-      onChange={() => {
-        let itemId = document.getElementById("product[" + product_index + "]").value;
-        let qty = document.getElementById("quantity[" + product_index + "]").value;
-        if (!qty) {
-          qty = 1;
-        }
-        productSelected(itemId, qty);
-      }}>
-      <div className="form-outline" style={{ width: "33%", float: "left", padding: "0px 10px 5px 10px" }}>
-        <Field
-          as="select"
-          name={"product[" + product_index + "]"}
-          id={"product[" + product_index + "]"}
+    <div style={{ marginBottom: "6px" }}>
+      <div className="form-outline" style={{ width: "31%", float: "left", padding: "0px 10px 5px 10px" }}>
+        <select
+          name={"product[" + index + "]"}
+          id={"product[" + index + "]"}
+          style={{ width: "100%" }}
           className="select form-control-lg"
-          placeholder={selectedProduct}
-          style={{ width: "100%" }}>
-          {allProductList &&
-            allProductList.map((product, index) => (
+          onChange={() => {
+            productUpdatedForOrder(index);
+          }}
+          value={selectedProduct}>
+          {allProducts &&
+            allProducts.map((product, index) => (
               <option key={index} value={product.id}>
                 {product.name}
               </option>
             ))}
-        </Field>
+        </select>
       </div>
-      <div className="form-outline" style={{ width: "33%", float: "left", padding: "0px 10px 5px 10px" }}>
-        <Field
+      <div className="form-outline" style={{ width: "32%", float: "left", padding: "0px 10px 5px 10px" }}>
+        <input
           type="number"
-          id={"quantity[" + product_index + "]"}
-          name={"quantity[" + product_index + "]"}
-          className="form-control form-control-lg"
+          name={"quantity[" + index + "]"}
+          id={"quantity[" + index + "]"}
           style={{ textAlign: "center" }}
-          placeholder="1"
+          placeholder={quantity}
+          value={quantity}
+          className="form-control form-control-lg"
+          onChange={() => {
+            productUpdatedForOrder(index);
+          }}
         />
       </div>
       <div
         className="form-outline"
         style={{
-          width: "33%",
+          width: "32%",
           float: "left",
           padding: "0px 10px 5px 10px",
         }}>
-        <div
-          id={"subtotal[" + product_index + "]"}
-          style={{
-            border: "1px solid #ced4da",
-            textAlign: "center",
-            minHeight: "calc(1.5em + 1rem + 2px)",
-            padding: "0.5rem 1rem",
-            borderRadius: "0.3rem",
+        <input
+          type="number"
+          name={"subtotal[" + index + "]"}
+          id={"subtotal[" + index + "]"}
+          style={{ textAlign: "center" }}
+          placeholder={subtotal}
+          disabled
+          value={subtotal}
+          className="form-control form-control-lg"
+          onChange={() => {
+            productUpdatedForOrder(index);
+          }}
+        />
+      </div>
+
+      <div
+        className="form-outline"
+        style={{
+          width: "5%",
+          float: "right",
+          padding: "0px 10px 5px 10px",
+          textAlign: "right",
+        }}>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => {
+            removeAddedProductForTheOrder(index);
           }}>
-          {subtotal}
-        </div>
+          -
+        </button>
       </div>
     </div>
   );

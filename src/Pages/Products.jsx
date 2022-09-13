@@ -1,8 +1,11 @@
+import { Backdrop } from "@mui/material";
+import MuiTextField from "@mui/material/TextField";
 import axios from "axios";
 import { Field, Form, Formik } from "formik";
+import { Autocomplete, TextField } from "formik-mui";
 import React, { useEffect, useState } from "react";
+import * as Yup from "yup";
 import CustomEditIcon from "../Components/CustomEditIcon";
-import FormikAutocomplete from "../Components/FormikAutocomplete";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied";
@@ -50,7 +53,7 @@ export default function Products({ toggle }) {
   async function addEditProduct(values) {
     let funcName = "addNewProduct";
     values.userId = JSON.parse(sessionStorage.getItem("fullUserDetails")).id;
-    console.log(values);
+    values.category = values.category.id;
 
     if (productIdGoingTobeEdited >= 0) {
       funcName = "editProductDetails";
@@ -121,18 +124,31 @@ export default function Products({ toggle }) {
     setProductIdGoingTobeEdited(pid);
     toggleAddProductFormVisibility(true);
   }
+  function getCategoryById(id) {
+    for (let i = 0; i < allCategories.length; i++) {
+      if (allCategories[i].id == id) return allCategories[i];
+    }
+  }
+
+  const newProductValidationSchema = Yup.object().shape({
+    name: Yup.string().min(2, "Too Short!").max(50, "Too Long!").required("Required"),
+    label: Yup.string().min(2, "Too Short!").max(50, "Too Long!").required("Required"),
+    sku: Yup.string().min(2, "Too Short!").max(50, "Too Long!").required("Required"),
+    price: Yup.number().required("Required"),
+    defaultSalePrice: Yup.number().required("Required"),
+  });
+
   function getAddProductInitialValues() {
     if (productIdGoingTobeEdited > 0) {
       for (let i = 0; i < allProductList.length; i++) {
         if (allProductList[i].id == productIdGoingTobeEdited) {
-          console.log(allProductList[i]);
           return {
             name: allProductList[i].name,
             label: allProductList[i].label,
             sku: allProductList[i].sku,
             price: allProductList[i].price,
             defaultSalePrice: allProductList[i].default_sale_price,
-            category: allProductList[i].category_id,
+            category: getCategoryById(allProductList[i].category_id),
           };
         }
       }
@@ -143,7 +159,7 @@ export default function Products({ toggle }) {
         sku: "",
         price: "",
         defaultSalePrice: "",
-        category: "2",
+        category: "",
       };
     }
   }
@@ -158,7 +174,9 @@ export default function Products({ toggle }) {
           <Tabs />
           <div className="container-fluid">
             {/*....delete conformation.....*/}
-            <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={deleteConformationVisible}>
               <div className="deleteConformationBg">
                 <div>
                   <h4>Warning</h4>
@@ -182,9 +200,11 @@ export default function Products({ toggle }) {
                   </button>
                 </div>
               </div>
-            </div>
+            </Backdrop>
             {/*.......Add category form here...... */}
-            <div className="fullShadow" style={addCategoryVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={addCategoryVisible}>
               <div className="categoryFormBg">
                 <div style={{ padding: "0px 10px" }}>
                   <div style={{ marginBottom: "18px" }}>
@@ -204,11 +224,12 @@ export default function Products({ toggle }) {
                         {/*................title......................*/}
 
                         <div className="form-outline" style={{ padding: "0px 10px" }}>
-                          <label className="form-custom-label">Category Name</label>
                           <Field
                             type="text"
+                            component={TextField}
                             name="categoryName"
-                            placeholder="Category Name"
+                            label="Category Name"
+                            required
                             className="form-control form-control-lg"
                           />
                         </div>
@@ -234,11 +255,11 @@ export default function Products({ toggle }) {
                   </Formik>
                 </div>
               </div>
-            </div>
+            </Backdrop>
             {/*.......add product form here....... */}
-            <div className="fullShadow" style={addProductVisible ? { display: "block" } : { display: "none" }}>
+            <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }} open={addProductVisible}>
               <div className="productFormBg">
-                <div style={{ padding: "0px 10px" }}>
+                <div style={{ padding: "0px 10px", height: "100px" }}>
                   <div style={{ float: "left", width: "50%" }}>
                     <h2>Create New Product</h2>
                   </div>
@@ -255,6 +276,7 @@ export default function Products({ toggle }) {
                 <div>
                   <Formik
                     initialValues={getAddProductInitialValues()}
+                    validationSchema={newProductValidationSchema}
                     enableReinitialize
                     onSubmit={(values) => {
                       addEditProduct(values);
@@ -263,57 +285,86 @@ export default function Products({ toggle }) {
                       <div className="newProductForm">
                         {/*................title......................*/}
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Product Name</label>
-                          <Field
-                            type="text"
-                            name="name"
-                            placeholder="Product Name"
-                            className="form-control form-control-lg"
-                          />
+                        <div style={{ height: "100px" }}>
+                          <div
+                            className="form-outline"
+                            style={{ width: "50%", float: "left", padding: "10px 10px 10px 10px" }}>
+                            <Field
+                              type="text"
+                              component={TextField}
+                              name="name"
+                              label="Product Name"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
+
+                          <div
+                            className="form-outline"
+                            style={{ width: "50%", float: "right", padding: "10px 10px 10px 10px" }}>
+                            <Field
+                              component={TextField}
+                              label="Label"
+                              type="text"
+                              name="label"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
                         </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Label</label>
-                          <Field
-                            type="text"
-                            name="label"
-                            placeholder="Label"
-                            className="form-control form-control-lg"
-                          />
+                        <div style={{ height: "100px" }}>
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              type="text"
+                              label="SKU"
+                              component={TextField}
+                              name="sku"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
+
+                          <div className="form-outline" style={{ width: "50%", float: "right", padding: "10px 10px" }}>
+                            <Field
+                              name="category"
+                              component={Autocomplete}
+                              options={allCategories}
+                              style={{ width: "100%" }}
+                              getOptionLabel={(option) => option.category || ""}
+                              renderInput={(params) => (
+                                <MuiTextField
+                                  {...params}
+                                  name="category"
+                                  required
+                                  label="Category"
+                                  variant="outlined"
+                                />
+                              )}
+                            />
+                          </div>
                         </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">SKU</label>
-                          <Field type="text" name="sku" placeholder="SKU" className="form-control form-control-lg" />
-                        </div>
+                        <div style={{ height: "100px" }}>
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                            <Field
+                              type="number"
+                              component={TextField}
+                              name="price"
+                              label="Price"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Category</label>
-                          <Field
-                            name="owner"
-                            component={FormikAutocomplete}
-                            label="Owner"
-                            options={allCategories}
-                            textFieldProps={{ fullWidth: true, margin: "normal", variant: "outlined" }}
-                          />
+                          <div className="form-outline" style={{ width: "50%", float: "right", padding: "10px 10px" }}>
+                            <Field
+                              type="number"
+                              component={TextField}
+                              name="defaultSalePrice"
+                              placeholder="0"
+                              label="Default Sale Price"
+                              className="form-control form-control-lg"
+                            />
+                          </div>
                         </div>
-
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Product Cost</label>
-                          <Field type="number" name="price" placeholder="0" className="form-control form-control-lg" />
-                        </div>
-
-                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Default Sale Price</label>
-                          <Field
-                            type="number"
-                            name="defaultSalePrice"
-                            placeholder="0"
-                            className="form-control form-control-lg"
-                          />
-                        </div>
-                        <div style={{ float: "right", width: "100%", padding: "32px 10px 3px 10px" }}>
+                        <div style={{ float: "right", width: "100%", padding: "20px 10px 3px 10px" }}>
                           <button
                             style={{ width: "20%" }}
                             className="btn btn-secondary btn-lg"
@@ -334,7 +385,8 @@ export default function Products({ toggle }) {
                   </Formik>
                 </div>
               </div>
-            </div>
+            </Backdrop>
+            {/* .............show products............ */}
             <table className="table table-striped">
               <thead className="thead-dark">
                 <tr>

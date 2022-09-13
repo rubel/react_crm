@@ -1,15 +1,20 @@
+import { Backdrop } from "@mui/material";
+import MuiTextField from "@mui/material/TextField";
 import axios from "axios";
 import { Field, Form, Formik } from "formik";
+import { Autocomplete, TextField } from "formik-mui";
 import React, { useEffect, useState } from "react";
 import { AiFillInfoCircle, AiOutlineReload } from "react-icons/ai";
-import { BiCalendar, BiSearch } from "react-icons/bi";
+import { BiCalendar, BiPlus, BiSearch } from "react-icons/bi";
 import { BsPersonFill } from "react-icons/bs";
 import { FiShare2 } from "react-icons/fi";
 import { TiFlowMerge, TiWarning } from "react-icons/ti";
+import * as Yup from "yup";
 import ConformationStatusMenu from "../Components/ConformationStatusMenu.jsx";
 import DeliveryStatusMenu from "../Components/DeliveryStatusMenu.jsx";
 import OrderEditIcon from "../Components/OrderEditIcon";
-import ProductRowInOrder from "../Components/ProductRowInOrder.jsx";
+import ProductRowInOrder from "../Components/ProductRowInOrder";
+import { SERVER_URL } from "../Constants/AppConstants.js";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied.jsx";
@@ -24,7 +29,6 @@ function Orders({ toggle }) {
   const [selectedStatusForConformationStatusChange, setSelectedStatusForConformationStatusChange] = useState("");
   const [selectedStatusForDeliveryStatusChange, setSelectedStatusForDeliveryStatusChange] = useState("");
   const [trackingCode, setTrackingCode] = useState(getRandomTrackingCode);
-  const [numberOfProductsInAddOrderForm, setNumberOfProductsInAddOrderForm] = useState(1);
   const [userInteractionOrderId, setUserInteractionOrderId] = useState(-100);
   const [statusChangeVisible, setStatusChangeVisible] = useState(false);
   const [statusHistoryVisible, setStatusHistoryVisible] = useState(false);
@@ -33,6 +37,11 @@ function Orders({ toggle }) {
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const [addOrderFormVisible, setAddOrderFormVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState({});
+  const [productsForSelectedOrder, setProductsForSelectedOrder] = useState({
+    product_ids: [],
+    quantities: [],
+    subtotals: [],
+  });
 
   const allConformationStatuses = [
     "New",
@@ -56,7 +65,7 @@ function Orders({ toggle }) {
 
   async function getAllOrders(searchTerm = "") {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllOrders",
         searchTerm: searchTerm,
       });
@@ -69,21 +78,66 @@ function Orders({ toggle }) {
   }
   async function getAllProductList() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllProducts",
       });
 
       if (res.data) {
         setAllProductList(res.data);
+        setProductsForSelectedOrder({ product_ids: [res.data[0].id], quantities: [0], subtotals: [0] });
       }
     } catch (error) {
       console.log(error);
     }
   }
 
+  function getProductById(id) {
+    for (let i = 0; i < allProductList.length; i++) {
+      if (allProductList[i].id == id) {
+        return allProductList[i];
+      }
+    }
+  }
+  function updateProductListForOrder(index) {
+    let product = document.getElementById("product[" + index + "]").value;
+    let quantity = document.getElementById("quantity[" + index + "]").value;
+    let price = getProductById(product).price;
+
+    let subtotal = quantity * price;
+    let products = productsForSelectedOrder.product_ids;
+    let quantities = productsForSelectedOrder.quantities;
+    let subtotals = productsForSelectedOrder.subtotals;
+
+    products[index] = product;
+    quantities[index] = quantity ? quantity : 0;
+    subtotals[index] = subtotal ? subtotal : 0;
+
+    setProductsForSelectedOrder({
+      product_ids: products,
+      quantities: quantities,
+      subtotals: subtotals,
+    });
+  }
+
+  let removeAddedProductFromOrderedProductList = (id) => {
+    let allProducts = productsForSelectedOrder.product_ids;
+    let allQuantities = productsForSelectedOrder.quantities;
+    let allSubtotals = productsForSelectedOrder.subtotals;
+
+    allProducts.splice(id, 1);
+    allQuantities.splice(id, 1);
+    allSubtotals.splice(id, 1);
+
+    setProductsForSelectedOrder({
+      product_ids: allProducts,
+      quantities: allQuantities,
+      subtotals: allSubtotals,
+    });
+  };
+
   async function deleteTheOrder() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "deleteTheOrder",
 
         id: userInteractionOrderId,
@@ -100,7 +154,7 @@ function Orders({ toggle }) {
 
   async function getAllAgents() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllAgents",
       });
       if (res.data) {
@@ -174,40 +228,63 @@ function Orders({ toggle }) {
     updateOrderDetails(id);
   }
   function updateOrderDetails(id) {
+    setSelectedOrder(getOrderDetailsForId(id));
+  }
+
+  function getOrderDetailsForId(id) {
     for (let i = 0; i < allOrders.length; i++) {
       if (allOrders[i].id == id) {
-        setSelectedOrder(allOrders[i]);
-        setNumberOfProductsInAddOrderForm(allOrders[i].products.length);
-        break;
+        return allOrders[i];
       }
     }
   }
-  function getProductIdsArray() {
+  function getProductIdsArray(id) {
+    let theOrderDetails = getOrderDetailsForId(id);
+
     let products = [];
-    for (let index = 0; index < selectedOrder.products.length; index++) {
-      products.push(selectedOrder.products[index].id);
+    for (let index = 0; index < theOrderDetails.products.length; index++) {
+      products.push(theOrderDetails.products[index].id);
     }
     return products;
   }
-  function getProductQuantitiesArray() {
+  function getProductQuantitiesArray(id) {
+    let theOrderDetails = getOrderDetailsForId(id);
     let quantity = [];
-    for (let index = 0; index < selectedOrder.products.length; index++) {
-      quantity.push(selectedOrder.products[index].quantity);
+    for (let index = 0; index < theOrderDetails.products.length; index++) {
+      quantity.push(theOrderDetails.products[index].quantity);
     }
     return quantity;
   }
-  function getSubtotalsArray() {
+  function getSubtotalsArray(id) {
+    let theOrderDetails = getOrderDetailsForId(id);
     let subtotal = [];
-    for (let index = 0; index < selectedOrder.products.length; index++) {
-      subtotal.push(parseInt(selectedOrder.products[index].quantity) * parseInt(selectedOrder.products[index].price));
+    for (let index = 0; index < theOrderDetails.products.length; index++) {
+      subtotal.push(
+        parseInt(theOrderDetails.products[index].quantity) * parseInt(theOrderDetails.products[index].price)
+      );
     }
     return subtotal;
   }
+  function getCustomerById(cid) {
+    for (let i = 0; i < allCustomerList.length; i++) {
+      if (allCustomerList[i].id == cid) {
+        return allCustomerList[i];
+      }
+    }
+  }
+  function getDeliveryServiceById(did) {
+    for (let i = 0; i < allDeliveryManagers.length; i++) {
+      if (allDeliveryManagers[i].id == did) {
+        return allDeliveryManagers[i];
+      }
+    }
+  }
+
   function getAddOrderInitialValues() {
     if (userInteractionOrderId >= 0) {
       return {
-        customer_id: selectedOrder.customer_id,
-        delivery_service: selectedOrder.delivery_service,
+        customer_id: getCustomerById(selectedOrder.customer_id),
+        delivery_service: getDeliveryServiceById(selectedOrder.delivery_service),
         shipping: selectedOrder.shipping_paid,
         conformation_status: selectedOrder.statuses[selectedOrder.statuses.length - 1].conformation_status,
         delivery_status: selectedOrder.statuses[selectedOrder.statuses.length - 1].delivery_status,
@@ -218,37 +295,14 @@ function Orders({ toggle }) {
         order_source: selectedOrder.source,
         stock_transfer: selectedOrder.stock_transfer == "1",
         ispinned: selectedOrder.ispinned == "1",
-        product: getProductIdsArray(selectedOrder),
-        quantity: getProductQuantitiesArray(selectedOrder),
-        subtotal: getSubtotalsArray(selectedOrder),
+        product: getProductIdsArray(userInteractionOrderId),
+        quantity: getProductQuantitiesArray(userInteractionOrderId),
+        subtotal: getSubtotalsArray(userInteractionOrderId),
       };
     } else {
-      // let ini = {
-      //   customer_id: allCustomerList.length > 0 ? allCustomerList[0].id : 0,
-      //   delivery_service: allDeliveryManagers.length > 0 ? allDeliveryManagers[0].id : 0,
-      //   shipping: 0,
-      //   conformation_status: "New",
-      //   delivery_status: "New",
-      //   shipping_cost: 0,
-      //   delivery_note: "",
-      //   note: "",
-      //   tracking_code: "",
-      //   order_source: allOrderSources.length > 0 ? allOrderSources[0].source : 0,
-      //   stock_transfer: false,
-      //   product: getArrayOfIntegerOfTimes(
-      //     allProductList.length > 0 ? allProductList[0].id : 0,
-      //     numberOfProductsInAddOrderForm
-      //   ),
-      //   quantity: getArrayOfIntegerOfTimes(1, numberOfProductsInAddOrderForm),
-      //   subtotal: getArrayOfIntegerOfTimes(
-      //     allProductList.length > 0 ? allProductList[0].price : 0,
-      //     numberOfProductsInAddOrderForm
-      //   ),
-      // };
-
       let ini = {
-        customer_id: allCustomerList.length > 0 ? allCustomerList[0].id : 0,
-        delivery_service: allDeliveryManagers.length > 0 ? allDeliveryManagers[0].id : 0,
+        customer_id: allCustomerList.length > 0 ? allCustomerList[0] : "",
+        delivery_service: allDeliveryManagers.length > 0 ? allDeliveryManagers[0] : "",
         shipping: 0,
         conformation_status: "New",
         delivery_status: "New",
@@ -257,7 +311,7 @@ function Orders({ toggle }) {
         note: "",
         tracking_code: "",
         ispinned: false,
-        order_source: allOrderSources.length > 0 ? allOrderSources[0].source : 0,
+        order_source: allOrderSources.length > 0 ? allOrderSources[0] : "",
         stock_transfer: false,
         product: [allProductList.length > 0 ? allProductList[0].id : 0],
         quantity: [1],
@@ -266,16 +320,9 @@ function Orders({ toggle }) {
       return ini;
     }
   }
-  // function getArrayOfIntegerOfTimes(item, times) {
-  //   let arr = [];
-  //   for (let i = 0; i < times; i++) {
-  //     arr.push(item);
-  //   }
-  //   return arr;
-  // }
   async function getAllCustomerList() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllCustomers",
       });
 
@@ -288,7 +335,7 @@ function Orders({ toggle }) {
   }
   async function getAllDeliveryManagers() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllDeliveryManagers",
       });
 
@@ -301,12 +348,15 @@ function Orders({ toggle }) {
   }
   async function getAllOrderSources() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllOrderSources",
       });
 
       if (res.data) {
-        setAllOrderSources(res.data);
+        let sourcesArray = res.data.map((val) => {
+          return val.source;
+        });
+        setAllOrderSources(sourcesArray);
       }
     } catch (error) {
       console.log(error);
@@ -325,51 +375,35 @@ function Orders({ toggle }) {
     }
     return prices;
   }
+  function editOrderButtonPressed(id) {
+    setUserInteractionOrderId(id);
+    updateOrderDetails(id);
+    setAddOrderFormVisible(true);
+
+    setProductsForSelectedOrder({
+      product_ids: getProductIdsArray(id),
+      quantities: getProductQuantitiesArray(id),
+      subtotals: getSubtotalsArray(id),
+    });
+  }
   async function addEditOrder(values) {
     values.userId = JSON.parse(sessionStorage.getItem("fullUserDetails")).id;
     values.tracking_code = document.getElementById("tracking_code").placeholder;
     values.stock_transfer = document.getElementById("stock_transfer").checked;
     values.isPinned = document.getElementById("isPinned").checked;
     values.prices = getProductPrices(values.product);
+    values.customer_id = values.customer_id.id;
+    values.delivery_service = values.delivery_service.id;
 
     let funcName = userInteractionOrderId > 0 ? "editOrder" : "addNewOrder";
     values.orderId = userInteractionOrderId;
 
-    let products = values.product;
-    for (let i = 0; i < numberOfProductsInAddOrderForm; i++) {
-      if (!products[i]) {
-        products.push(allProductList[0].id);
-      }
-    }
-
-    let quantities = values.quantity;
-    for (let i = 0; i < numberOfProductsInAddOrderForm; i++) {
-      if (!quantities[i]) {
-        quantities.push(1);
-      }
-    }
-
-    let prices = values.prices;
-    for (let i = 0; i < numberOfProductsInAddOrderForm; i++) {
-      if (!prices[i]) {
-        prices.push(allProductList[0].price);
-      }
-    }
-
-    values.quantity = quantities;
-    values.product = products;
-    values.prices = prices;
-
-    let subtotals = values.subtotal;
-    for (let i = 0; i < numberOfProductsInAddOrderForm; i++) {
-      if (!subtotals[i]) {
-        subtotals.push((prices[i] * quantities[i]).toString());
-      }
-    }
-    values.subtotal = subtotals;
+    values.quantity = productsForSelectedOrder.quantities;
+    values.product = productsForSelectedOrder.product_ids;
+    values.subtotal = productsForSelectedOrder.subtotals;
 
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: funcName,
         formData: JSON.stringify(values),
       });
@@ -386,7 +420,7 @@ function Orders({ toggle }) {
   async function assignAgentForOrder(values) {
     values.order_id = userInteractionOrderId;
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "assignAgentForOrder",
         formData: JSON.stringify(values),
       });
@@ -406,7 +440,7 @@ function Orders({ toggle }) {
     values.order_id = userInteractionOrderId;
 
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "addStatusForDelivery",
         formData: JSON.stringify(values),
       });
@@ -420,6 +454,13 @@ function Orders({ toggle }) {
       console.log(error);
     }
   }
+
+  const newOrderValidationSchema = Yup.object().shape({
+    shipping: Yup.number().required("Required"),
+    shipping_cost: Yup.number().required("Required"),
+    delivery_note: Yup.string().min(2, "Too Short!").max(500, "Too Long!").required("Required"),
+    note: Yup.string().min(2, "Too Short!").max(500, "Too Long!").required("Required"),
+  });
 
   useEffect(() => {
     getAllOrders();
@@ -440,10 +481,16 @@ function Orders({ toggle }) {
           <Tabs />
           <div className="container-fluid">
             {/*...........add order form.................*/}
-            <div className="fullShadow" style={addOrderFormVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                overflowY: "scroll",
+              }}
+              open={addOrderFormVisible}>
               <div className="addOrderFormBg">
                 <Formik
                   initialValues={getAddOrderInitialValues()}
+                  validationSchema={newOrderValidationSchema}
                   enableReinitialize
                   onSubmit={(values) => {
                     addEditOrder(values);
@@ -477,177 +524,262 @@ function Orders({ toggle }) {
                     <div>
                       <div className="newOrderForm">
                         {/*.........row 1..............*/}
-                        <div>
-                          <div className="form-outline" style={{ width: "28%", float: "left", padding: "0px 10px" }}>
-                            <label className="form-custom-label">Customer Name</label>
-                            <Field
-                              as="select"
-                              name="customer_id"
-                              className="select form-control-lg"
-                              style={{ width: "100%" }}>
-                              {allCustomerList &&
-                                allCustomerList.map((customer, index) => (
-                                  <option key={index} value={customer.id}>
-                                    {customer.name}
-                                  </option>
-                                ))}
-                            </Field>
+                        <div style={{ height: "100px" }}>
+                          <div style={{ width: "33%", padding: "10px 10px", float: "left" }}>
+                            <div className="form-outline" style={{ width: "79%", float: "left" }}>
+                              <Field
+                                name="customer_id"
+                                component={Autocomplete}
+                                options={allCustomerList}
+                                style={{ width: "100%" }}
+                                isOptionEqualToValue={(option, value) => {
+                                  return option.id === value;
+                                }}
+                                getOptionLabel={(option) => option.name || ""}
+                                renderInput={(params) => {
+                                  const inputProps = params.inputProps;
+                                  inputProps.autoComplete = "disabled";
+                                  return (
+                                    <MuiTextField
+                                      {...params}
+                                      inputProps={inputProps}
+                                      name="customer_id"
+                                      required
+                                      label="Customer Name"
+                                      variant="outlined"
+                                      fullWidth
+                                    />
+                                  );
+                                }}
+                              />
+                            </div>
+
+                            <div
+                              style={{
+                                lineHeight: "27px",
+                                width: "50px",
+                                height: "55px",
+                                verticalAlign: "middle",
+                                float: "right",
+                              }}>
+                              <button
+                                className="btn btn-secondary btn-lg"
+                                type="button"
+                                style={{ width: "56px", height: "56px" }}>
+                                <BiPlus />
+                              </button>
+                            </div>
                           </div>
 
-                          <div style={{ float: "left", width: "5%" }}>
-                            <label className="form-custom-label">&nbsp;</label>
-                            <button className="btn btn-secondary btn-lg" type="button" style={{ lineHeight: "24px" }}>
-                              +
-                            </button>
-                          </div>
-
-                          <div className="form-outline" style={{ width: "33%", float: "left", padding: "0px 10px" }}>
-                            <label className="form-custom-label">Delivery Service: </label>
+                          <div className="form-outline" style={{ width: "33%", float: "left", padding: "10px 10px" }}>
                             <Field
-                              as="select"
                               name="delivery_service"
-                              className="select form-control-lg"
-                              style={{ width: "100%" }}>
-                              {allDeliveryManagers &&
-                                allDeliveryManagers.map((dl, index) => (
-                                  <option key={index} value={dl.id}>
-                                    {dl.title + " " + dl.firstname + " " + dl.lastname}
-                                  </option>
-                                ))}
-                            </Field>
+                              component={Autocomplete}
+                              options={allDeliveryManagers}
+                              style={{ width: "100%" }}
+                              getOptionLabel={(option) => {
+                                if (option && option.title) {
+                                  return option.title + " " + option.firstname + " " + option.lastname;
+                                }
+                                return "";
+                              }}
+                              renderInput={(params) => {
+                                const inputProps = params.inputProps;
+                                inputProps.autoComplete = "disabled";
+                                return (
+                                  <MuiTextField
+                                    {...params}
+                                    inputProps={inputProps}
+                                    name="delivery_service"
+                                    label="Delivery Service"
+                                    required
+                                    variant="outlined"
+                                    fullWidth
+                                  />
+                                );
+                              }}
+                            />
                           </div>
-                          <div className="form-outline" style={{ width: "33%", float: "left", padding: "0px 10px" }}>
-                            <label className="form-custom-label">
-                              Paid by Customer (shipping)
-                              <AiFillInfoCircle />
-                            </label>
+                          <div className="form-outline" style={{ width: "33%", float: "right", padding: "10px 10px" }}>
                             <Field
                               type="text"
+                              component={TextField}
                               name="shipping"
-                              placeholder="0"
+                              autoComplete="disabled"
+                              label="Paid by Customer (shipping)"
                               className="form-control form-control-lg"
                             />
                           </div>
                         </div>
 
                         {/*.........row 2..............*/}
-                        <div>
-                          <div className="form-outline" style={{ width: "33%", float: "left", padding: "0px 10px" }}>
-                            <label className="form-custom-label">Conformation Status: </label>
+                        <div style={{ height: "100px" }}>
+                          <div className="form-outline" style={{ width: "33%", float: "left", padding: "10px 10px" }}>
                             <Field
-                              as="select"
                               name="conformation_status"
-                              className="select form-control-lg"
-                              style={{ width: "100%" }}>
-                              {allConformationStatuses &&
-                                allConformationStatuses.map((cnf, index) => (
-                                  <option key={index} value={cnf}>
-                                    {cnf}
-                                  </option>
-                                ))}
-                            </Field>
+                              component={Autocomplete}
+                              options={allConformationStatuses}
+                              style={{ width: "100%" }}
+                              renderInput={(params) => {
+                                const inputProps = params.inputProps;
+                                inputProps.autoComplete = "disabled";
+                                return (
+                                  <MuiTextField
+                                    {...params}
+                                    inputProps={inputProps}
+                                    required
+                                    name="conformation_status"
+                                    label="Conformation Status"
+                                    variant="outlined"
+                                    fullWidth
+                                  />
+                                );
+                              }}
+                            />
                           </div>
 
-                          <div className="form-outline" style={{ width: "33%", float: "left", padding: "0px 10px" }}>
-                            <label className="form-custom-label">Delivery Status: </label>
+                          <div className="form-outline" style={{ width: "33%", float: "left", padding: "10px 10px" }}>
                             <Field
-                              as="select"
                               name="delivery_status"
-                              className="select form-control-lg"
-                              style={{ width: "100%" }}>
-                              {allDeliveryStatuses &&
-                                allDeliveryStatuses.map((dl, index) => (
-                                  <option key={index} value={dl}>
-                                    {dl}
-                                  </option>
-                                ))}
-                            </Field>
+                              component={Autocomplete}
+                              options={allDeliveryStatuses}
+                              style={{ width: "100%" }}
+                              renderInput={(params) => {
+                                const inputProps = params.inputProps;
+                                inputProps.autoComplete = "disabled";
+                                return (
+                                  <MuiTextField
+                                    {...params}
+                                    inputProps={inputProps}
+                                    required
+                                    name="delivery_status"
+                                    label="Delivery Status"
+                                    variant="outlined"
+                                    fullWidth
+                                  />
+                                );
+                              }}
+                            />
                           </div>
 
-                          <div className="form-outline" style={{ width: "33%", float: "left", padding: "0px 10px" }}>
-                            <label className="form-custom-label">
-                              Shipping Cost
-                              <AiFillInfoCircle />
-                            </label>
+                          <div className="form-outline" style={{ width: "33%", float: "right", padding: "10px 10px" }}>
                             <Field
                               type="text"
+                              component={TextField}
                               name="shipping_cost"
-                              placeholder="0"
+                              autoComplete="disabled"
+                              label="Shipping Cost"
                               className="form-control form-control-lg"
                             />
                           </div>
                         </div>
+
                         {/*.........row 3..............*/}
-                        <div>
-                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                            <label className="form-custom-label">Delivery Service Note: </label>
+                        <div style={{ height: "145px" }}>
+                          <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
                             <Field
-                              as="textarea"
+                              type="text"
+                              component={TextField}
+                              multiline
+                              rows={3}
                               name="delivery_note"
-                              className="select form-control-lg"
-                              style={{ width: "100%" }}
+                              autoComplete="disabled"
+                              label="Delivery Service Note"
+                              className="form-control form-control-lg"
                             />
                           </div>
 
-                          <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                            <label className="form-custom-label">Your Note: </label>
+                          <div className="form-outline" style={{ width: "50%", float: "right", padding: "10px 10px" }}>
                             <Field
-                              as="textarea"
+                              type="text"
+                              component={TextField}
                               name="note"
-                              className="select form-control-lg"
-                              style={{ width: "100%" }}
+                              autoComplete="disabled"
+                              multiline
+                              rows={3}
+                              label="Your Note"
+                              className="form-control form-control-lg"
                             />
                           </div>
                         </div>
+
                         {/*.........row 4..............*/}
                         <div style={{ marginBottom: "10px" }}>
                           <div>
-                            <div className="form-outline" style={{ width: "28%", float: "left", padding: "0px 10px" }}>
-                              <label className="form-custom-label">Tracking Code</label>
-                              <Field
-                                type="text"
-                                name="tracking_code"
-                                disabled
-                                id="tracking_code"
-                                placeholder={trackingCode}
-                                className="form-control form-control-lg"
-                              />
-                            </div>
-                            <div style={{ float: "left", width: "5%" }}>
-                              <label className="form-custom-label">&nbsp;</label>
-                              <button
-                                style={{ lineHeight: "15px" }}
-                                className="btn btn-secondary btn-lg"
-                                type="button"
-                                onClick={() => {
-                                  setTrackingCode(getRandomTrackingCode());
+                            <div style={{ width: "33%", padding: "10px 10px", float: "left" }}>
+                              <div className="form-outline" style={{ width: "79%", float: "left" }}>
+                                <Field
+                                  type="text"
+                                  component={TextField}
+                                  name="tracking_code"
+                                  id="tracking_code"
+                                  autoComplete="disabled"
+                                  value={trackingCode}
+                                  disabled
+                                  label="Tracking Code"
+                                  className="form-control form-control-lg"
+                                />
+                              </div>
+                              <div
+                                style={{
+                                  lineHeight: "27px",
+                                  width: "50px",
+                                  height: "55px",
+                                  verticalAlign: "middle",
+                                  float: "right",
                                 }}>
-                                <AiOutlineReload />
-                              </button>
+                                <button
+                                  className="btn btn-secondary btn-lg"
+                                  type="button"
+                                  style={{ width: "56px", height: "56px" }}
+                                  onClick={() => {
+                                    setTrackingCode(getRandomTrackingCode());
+                                  }}>
+                                  <AiOutlineReload />
+                                </button>
+                              </div>
                             </div>
                           </div>
-                          <div className="form-outline" style={{ width: "33%", float: "left", padding: "0px 10px" }}>
-                            <label className="form-custom-label">Source: </label>
+                          <div className="form-outline" style={{ width: "33%", float: "left", padding: "10px 10px" }}>
                             <Field
-                              as="select"
                               name="order_source"
-                              className="select form-control-lg"
-                              style={{ width: "100%" }}>
-                              {allOrderSources &&
-                                allOrderSources.map((src, index) => (
-                                  <option key={index} value={src.source}>
-                                    {src.source}
-                                  </option>
-                                ))}
-                            </Field>
+                              component={Autocomplete}
+                              options={allOrderSources}
+                              style={{ width: "100%" }}
+                              getOptionLabel={(option) => option || ""}
+                              renderInput={(params) => {
+                                const inputProps = params.inputProps;
+                                inputProps.autoComplete = "disabled";
+                                return (
+                                  <MuiTextField
+                                    {...params}
+                                    inputProps={inputProps}
+                                    name="order_source"
+                                    label="Source"
+                                    required
+                                    variant="outlined"
+                                    fullWidth
+                                  />
+                                );
+                              }}
+                            />
                           </div>
                           <div
                             className="form-outline"
-                            style={{ width: "33%", float: "left", padding: "0px 10px", height: "66px" }}>
-                            <div className="form-custom-label" style={{ fontWeight: "bold", paddingBottom: "6px" }}>
+                            style={{ width: "33%", float: "left", padding: "0px 10px", height: "76px" }}>
+                            <div
+                              className="form-custom-label"
+                              style={{
+                                fontWeight: "bold",
+                                paddingBottom: "6px",
+                                paddingTop: "24px",
+                                width: "48%",
+                                float: "right",
+                                textAlign: "right",
+                              }}>
                               Stock Transfer: <AiFillInfoCircle />
                             </div>
-                            <div style={{ width: "30%", float: "left" }}>
+                            <div style={{ width: "30%", float: "right", paddingTop: "18px", textAlign: "right" }}>
                               <label className="switch">
                                 <div style={{ paddingTop: "12px" }}>
                                   <input type="checkbox" name="stock_transfer" id="stock_transfer" />
@@ -679,7 +811,18 @@ function Orders({ toggle }) {
                                 type="button"
                                 style={{ lineHeight: "16px" }}
                                 onClick={() => {
-                                  setNumberOfProductsInAddOrderForm(numberOfProductsInAddOrderForm + 1);
+                                  let product_ids = productsForSelectedOrder.product_ids;
+                                  let quantities = productsForSelectedOrder.quantities;
+                                  let subtotals = productsForSelectedOrder.subtotals;
+
+                                  product_ids.push(0);
+                                  quantities.push(0);
+                                  subtotals.push(0);
+                                  setProductsForSelectedOrder({
+                                    product_ids: product_ids,
+                                    quantities: quantities,
+                                    subtotals: subtotals,
+                                  });
                                 }}>
                                 +
                               </button>
@@ -688,17 +831,20 @@ function Orders({ toggle }) {
                         </div>
                         {/*.........product list here................*/}
                         <hr style={{ width: "90%", marginBottom: "10px" }} />
+
                         <div>
-                          {Array(numberOfProductsInAddOrderForm)
-                            .fill(1)
-                            .map((el, i) => (
+                          {productsForSelectedOrder.product_ids &&
+                            productsForSelectedOrder.product_ids.map((p, index) => (
                               <ProductRowInOrder
-                                selectedProduct={getAddOrderInitialValues().product[i]}
-                                quantity={getAddOrderInitialValues().quantity[i]}
-                                subtotal={getAddOrderInitialValues().subtotal[i]}
-                                product_index={i}
-                                key={i}
-                                allProductList={allProductList}
+                                removeAddedProductForTheOrder={removeAddedProductFromOrderedProductList}
+                                productUpdatedForOrder={updateProductListForOrder}
+                                product={p}
+                                index={index}
+                                selectedProduct={productsForSelectedOrder.product_ids[index]}
+                                key={index}
+                                allProducts={allProductList}
+                                quantity={productsForSelectedOrder.quantities[index]}
+                                subtotal={productsForSelectedOrder.subtotals[index]}
                               />
                             ))}
                         </div>
@@ -725,9 +871,14 @@ function Orders({ toggle }) {
                   </Form>
                 </Formik>
               </div>
-            </div>
+            </Backdrop>
             {/*...........delete confirm.................*/}
-            <div className="fullShadow" style={deleteConfirmVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                overflowY: "scroll",
+              }}
+              open={deleteConfirmVisible}>
               <div className="deleteOrderConfirmBg">
                 <div>
                   <h4>Warning</h4>
@@ -759,9 +910,14 @@ function Orders({ toggle }) {
                   </button>
                 </div>
               </div>
-            </div>
+            </Backdrop>
             {/*.............view order....................*/}
-            <div className="fullShadow" style={orderDetailsPageVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                overflowY: "scroll",
+              }}
+              open={orderDetailsPageVisible}>
               <div className="orderDetailsBg">
                 <div>
                   <div style={{ width: "90%", float: "left" }}>{userInteractionOrderId > 0 && selectedOrder.id}</div>
@@ -927,9 +1083,14 @@ function Orders({ toggle }) {
                   </div>
                 </div>
               </div>
-            </div>
+            </Backdrop>
             {/*...........assign order to.................*/}
-            <div className="fullShadow" style={assignOrderVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                overflowY: "scroll",
+              }}
+              open={assignOrderVisible}>
               <div className="assignOrderBg">
                 <Formik
                   initialValues={{
@@ -991,10 +1152,15 @@ function Orders({ toggle }) {
                   </Form>
                 </Formik>
               </div>
-            </div>
+            </Backdrop>
 
             {/*...........status history.................*/}
-            <div className="fullShadow" style={statusHistoryVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                overflowY: "scroll",
+              }}
+              open={statusHistoryVisible}>
               <div className="changeStatusFormBg">
                 <div style={{ padding: "0px 10px" }}>
                   <div style={{ marginBottom: "18px", float: "left", width: "90%" }}>
@@ -1042,10 +1208,15 @@ function Orders({ toggle }) {
                   </div>
                 </div>
               </div>
-            </div>
+            </Backdrop>
 
             {/*....conformation status change.....*/}
-            <div className="fullShadow" style={statusChangeVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                overflowY: "scroll",
+              }}
+              open={statusChangeVisible}>
               <div className="changeStatusFormBg">
                 <div style={{ padding: "0px 10px" }}>
                   <div style={{ marginBottom: "18px" }}>
@@ -1128,7 +1299,7 @@ function Orders({ toggle }) {
                   </Formik>
                 </div>
               </div>
-            </div>
+            </Backdrop>
 
             {/*.......list orders here..........*/}
 
@@ -1235,9 +1406,7 @@ function Orders({ toggle }) {
                             setDeleteConfirmVisible(true);
                           }}
                           editPressedFunc={(id) => {
-                            setUserInteractionOrderId(id);
-                            updateOrderDetails(id);
-                            setAddOrderFormVisible(true);
+                            editOrderButtonPressed(id);
                           }}
                         />
                       </td>

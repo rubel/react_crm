@@ -1,8 +1,12 @@
+import { Backdrop } from "@mui/material";
+import MuiTextField from "@mui/material/TextField";
 import axios from "axios";
 import { Field, Form, Formik } from "formik";
+import { Autocomplete, TextField } from "formik-mui";
 import React, { useEffect, useState } from "react";
 import { AiOutlineReload } from "react-icons/ai";
 import { FaSearch } from "react-icons/fa";
+import * as Yup from "yup";
 import WarehouseBlock from "../Components/WarehouseBlock";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
@@ -38,13 +42,14 @@ export default function Warehouses({ toggle }) {
       });
 
       if (res.data) {
-        setAllCities(res.data);
+        let cities = res.data.map((val) => val.city);
+        setAllCities(cities);
       }
     } catch (error) {
       console.log(error);
     }
   }
-  async function addNewCity(values) {
+  async function addNewCity(values, resetFormFunc) {
     values.userId = JSON.parse(sessionStorage.getItem("fullUserDetails")).id;
     try {
       const res = await axios.post("http://localhost:80/crm/service.php", {
@@ -53,6 +58,7 @@ export default function Warehouses({ toggle }) {
       });
 
       if (res.data.includes("success")) {
+        resetFormFunc({ city: "" });
         getAllWarehouseList();
         setAddCityFormVisible(false);
         setAddWarehouseFormVisibility(true);
@@ -69,10 +75,11 @@ export default function Warehouses({ toggle }) {
     setWarehouseStockVisibility(false);
   }, []);
 
-  async function addEditWarehouse(values) {
+  async function addEditWarehouse(values, resetFormFunc) {
     let funcName = "addNewWarehouse";
     values.userId = JSON.parse(sessionStorage.getItem("fullUserDetails")).id;
     values.isdefault = document.getElementById("isdefault").checked;
+    values.city = values.city.city;
     if (selectedWarehouseId >= 0) {
       funcName = "editWarehouseDetails";
       values.id = selectedWarehouseId;
@@ -85,6 +92,7 @@ export default function Warehouses({ toggle }) {
       console.log(res);
       if (res.data.includes("success")) {
         setSelectedWarehouseId(-100);
+        resetFormFunc({ title: "", address: "", city: allCities.length > 0 ? allCities[0].id : 0 });
         setAddWarehouseFormVisibility(false);
         getAllWarehouseList();
       }
@@ -119,12 +127,28 @@ export default function Warehouses({ toggle }) {
     setDeleteConformationVisibility(true);
   }
   function getAddWarehouseInitialValues() {
-    return {
-      title: "",
-      address: "",
-      city: allCities.length > 0 ? allCities[0].id : 0,
-    };
+    if (selectedWarehouseId >= 0) {
+      for (let i = 0; i < allWarehouseList.length; i++) {
+        if (allWarehouseList[i].id == selectedWarehouseId) {
+          return {
+            title: allWarehouseList[i].title,
+            address: allWarehouseList[i].address,
+            city: allWarehouseList[i].city,
+          };
+        }
+      }
+    } else {
+      return {
+        title: "",
+        address: "",
+        city: allCities.length > 0 ? allCities[0].id : "",
+      };
+    }
   }
+  const addWarehouseValidationSchema = Yup.object().shape({
+    title: Yup.string().min(2, "Too Short!").max(50, "Too Long!").required("Required"),
+    address: Yup.string().min(2, "Too Short!").max(50, "Too Long!").required("Required"),
+  });
 
   var loggedIn = sessionStorage.getItem("uid");
 
@@ -136,7 +160,9 @@ export default function Warehouses({ toggle }) {
           <Tabs />
           <div className="container-fluid">
             {/*....delete conformation.....*/}
-            <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={deleteConformationVisible}>
               <div className="deleteConformationBg">
                 <div>
                   <h4>Warning</h4>
@@ -162,10 +188,12 @@ export default function Warehouses({ toggle }) {
                   </button>
                 </div>
               </div>
-            </div>
+            </Backdrop>
 
             {/*....add city.....*/}
-            <div className="fullShadow" style={addCityFormVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={addCityFormVisible}>
               <div className="cityFormBg">
                 <div style={{ padding: "0px 10px" }}>
                   <div style={{ marginBottom: "18px" }}>
@@ -177,16 +205,23 @@ export default function Warehouses({ toggle }) {
                     initialValues={{
                       city: "",
                     }}
-                    onSubmit={(values) => {
-                      addNewCity(values);
+                    onSubmit={(values, { resetForm }) => {
+                      addNewCity(values, resetForm);
                     }}>
                     <Form>
                       <div className="newCityForm">
                         {/*................title......................*/}
 
                         <div className="form-outline" style={{ padding: "0px 10px" }}>
-                          <label className="form-custom-label">Category Name</label>
-                          <Field type="text" name="city" placeholder="City" className="form-control form-control-lg" />
+                          <Field
+                            type="text"
+                            component={TextField}
+                            name="city"
+                            required
+                            autoComplete="disabled"
+                            label="City"
+                            className="form-control form-control-lg"
+                          />
                         </div>
 
                         <div style={{ float: "right", width: "100%", padding: "12px 10px 3px 10px" }}>
@@ -213,10 +248,12 @@ export default function Warehouses({ toggle }) {
                   </Formik>
                 </div>
               </div>
-            </div>
+            </Backdrop>
 
             {/*.......add warehouse form here....... */}
-            <div className="fullShadow" style={addWarehouseVisible ? { display: "block" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={addWarehouseVisible}>
               <div className="warehouseFormBg">
                 <div style={{ padding: "0px 10px" }}>
                   <div style={{ float: "left", width: "60%" }}>
@@ -250,42 +287,59 @@ export default function Warehouses({ toggle }) {
                   <Formik
                     initialValues={getAddWarehouseInitialValues()}
                     enableReinitialize
-                    onSubmit={(values) => {
-                      addEditWarehouse(values);
+                    validationSchema={addWarehouseValidationSchema}
+                    onSubmit={(values, { resetForm }) => {
+                      addEditWarehouse(values, resetForm);
                     }}>
                     <Form>
                       <div className="newProductForm">
                         {/*................title......................*/}
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Title</label>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
                           <Field
                             type="text"
+                            component={TextField}
                             name="title"
-                            placeholder="Title"
+                            autoComplete="disabled"
+                            label="Title"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">City: </label>
-                          <Field as="select" name="city" className="select form-control-lg" style={{ width: "100%" }}>
-                            {allCities &&
-                              allCities.map((c, index) => (
-                                <option key={index} value={c.city}>
-                                  {c.city}
-                                </option>
-                              ))}
-                          </Field>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
+                          <Field
+                            name="city"
+                            component={Autocomplete}
+                            options={allCities}
+                            style={{ width: "100%" }}
+                            getOptionLabel={(option) => option || ""}
+                            renderInput={(params) => {
+                              const inputProps = params.inputProps;
+                              inputProps.autoComplete = "disabled";
+                              return (
+                                <MuiTextField
+                                  {...params}
+                                  inputProps={inputProps}
+                                  name="city"
+                                  label="City"
+                                  variant="outlined"
+                                  fullWidth
+                                />
+                              );
+                            }}
+                          />
                         </div>
 
-                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Address: </label>
+                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "10px 10px" }}>
                           <Field
-                            as="textarea"
+                            type="text"
+                            component={TextField}
                             name="address"
-                            className="select form-control-lg"
-                            style={{ width: "100%" }}
+                            multiline
+                            rows={3}
+                            autoComplete="disabled"
+                            label="Address"
+                            className="form-control form-control-lg"
                           />
                         </div>
 
@@ -312,7 +366,7 @@ export default function Warehouses({ toggle }) {
                   </Formik>
                 </div>
               </div>
-            </div>
+            </Backdrop>
             {/*....................show warehouses........... */}
             <div className="warehouse_page_searchform">
               <Formik

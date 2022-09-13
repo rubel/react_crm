@@ -1,11 +1,11 @@
 import React from "react";
-import { LOGIN_URL } from "../Constants/AppConstants";
 import AccessDeniedAnim from "./AccessDeniedAnim";
 function AccessDenied() {
+  var host = window.location.host;
   return (
     <div>
       <AccessDeniedAnim>
-        <a href={LOGIN_URL}>Login</a>
+        <a href={host}>Login</a>
       </AccessDeniedAnim>
     </div>
   );

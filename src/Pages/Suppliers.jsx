@@ -1,7 +1,11 @@
+import { Backdrop } from "@mui/material";
+import MuiTextField from "@mui/material/TextField";
 import axios from "axios";
 import { Field, Form, Formik } from "formik";
+import { Autocomplete, TextField } from "formik-mui";
 import React, { useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
+import * as Yup from "yup";
 import CustomEditIcon from "../Components/CustomEditIcon";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
@@ -13,6 +17,8 @@ function Suppliers({ toggle }) {
   const [deleteConformationVisible, toggleDeleteConformationVisibility] = useState(false);
   const [addSupplierVisible, toggleAddSupplierFormVisibility] = useState(false);
   const [selectedSupplierId, setSelectedSupplierId] = useState(-100);
+  const [allCities, setAllCities] = useState([]);
+
   async function getAllSupplierList(searchTerm = "") {
     try {
       const res = await axios.post("http://localhost:80/crm/service.php", {
@@ -26,6 +32,20 @@ function Suppliers({ toggle }) {
       console.log(error);
     }
   }
+  async function getAllCities() {
+    try {
+      const res = await axios.post("http://localhost:80/crm/service.php", {
+        func: "getAllCities",
+      });
+
+      if (res.data) {
+        let cities = res.data.map((val) => val.city);
+        setAllCities(cities);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
   async function getAllCountryList() {
     try {
       const res = await axios.post("http://localhost:80/crm/service.php", {
@@ -33,15 +53,17 @@ function Suppliers({ toggle }) {
       });
 
       if (res.data) {
-        setAllCountries(res.data);
+        let countries = res.data.map((val) => val.country);
+        setAllCountries(countries);
       }
     } catch (error) {
       console.log(error);
     }
   }
-  async function addEditSupplier(values) {
+  async function addEditSupplier(values, resetFormFunc) {
     let funcName = "addNewSupplier";
     values.userId = JSON.parse(sessionStorage.getItem("fullUserDetails")).id;
+    values.country = values.country.country;
 
     if (selectedSupplierId >= 0) {
       funcName = "editSupplierDetails";
@@ -55,6 +77,7 @@ function Suppliers({ toggle }) {
 
       if (res.data.includes("success")) {
         setSelectedSupplierId(-100);
+        resetFormFunc(getAddSupplierInitialValues());
         getAllSupplierList();
         updateAddSupplierFormVisibility();
       }
@@ -103,6 +126,19 @@ function Suppliers({ toggle }) {
       };
     }
   }
+  const phoneRegExp =
+    /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+  const newSupplierValidationSchema = Yup.object().shape({
+    name: Yup.string().required("Required").min(3, "Minimum 3 chars").max(50, "Max 50 chars"),
+    phone: Yup.string().matches(phoneRegExp, "Phone number is not valid").required("required"),
+    whatsapp: Yup.string().matches(phoneRegExp, "Whatsup number is not valid").required("Required"),
+    address: Yup.string()
+      .required("Required")
+      .min(10, "Minimum 10 chars")
+      .max(500, "Max 500 chars")
+      .required("Required"),
+  });
+
   function updateAddSupplierFormVisibility() {
     let isVisible = !addSupplierVisible;
     toggleAddSupplierFormVisibility(isVisible);
@@ -121,6 +157,7 @@ function Suppliers({ toggle }) {
   useEffect(() => {
     getAllSupplierList();
     getAllCountryList();
+    getAllCities();
   }, []);
 
   var loggedIn = sessionStorage.getItem("uid");
@@ -133,7 +170,9 @@ function Suppliers({ toggle }) {
           <Tabs />
           <div className="container-fluid">
             {/*....delete conformation.....*/}
-            <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={deleteConformationVisible}>
               <div className="deleteConformationBg">
                 <div>
                   <h4>Warning</h4>
@@ -157,10 +196,12 @@ function Suppliers({ toggle }) {
                   </button>
                 </div>
               </div>
-            </div>
+            </Backdrop>
 
             {/*.......add supplier form here....... */}
-            <div className="fullShadow" style={addSupplierVisible ? { display: "block" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={addSupplierVisible}>
               <div className="supplierFormBg">
                 <div style={{ padding: "0px 10px" }}>
                   <div>
@@ -171,67 +212,103 @@ function Suppliers({ toggle }) {
                   <Formik
                     initialValues={getAddSupplierInitialValues()}
                     enableReinitialize
-                    onSubmit={(values) => {
-                      addEditSupplier(values);
+                    validationSchema={newSupplierValidationSchema}
+                    onSubmit={(values, { resetForm }) => {
+                      addEditSupplier(values, resetForm);
                     }}>
                     <Form>
                       <div className="newSupplierForm">
                         {/*................title......................*/}
 
-                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Supplier Name</label>
+                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "10px 10px" }}>
                           <Field
                             type="text"
+                            component={TextField}
                             name="name"
-                            placeholder="Supplier Name"
+                            autoComplete="disabled"
+                            label="Supplier Name"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Country: </label>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
                           <Field
-                            as="select"
                             name="country"
-                            className="select form-control-lg"
-                            style={{ width: "100%" }}>
-                            {allCountries &&
-                              allCountries.map((c, index) => (
-                                <option key={index} value={c.country}>
-                                  {c.country}
-                                </option>
-                              ))}
-                          </Field>
-                        </div>
-                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                          <label className="form-custom-label">City</label>
-                          <Field type="text" name="city" placeholder="City" className="form-control form-control-lg" />
-                        </div>
-                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Address: </label>
-                          <Field
-                            as="textarea"
-                            name="address"
-                            className="select form-control-lg"
+                            component={Autocomplete}
+                            options={allCountries}
                             style={{ width: "100%" }}
+                            getOptionLabel={(option) => option || ""}
+                            renderInput={(params) => {
+                              const inputProps = params.inputProps;
+                              inputProps.autoComplete = "disabled";
+                              return (
+                                <MuiTextField
+                                  {...params}
+                                  inputProps={inputProps}
+                                  name="country"
+                                  label="Country"
+                                  required
+                                  variant="outlined"
+                                  fullWidth
+                                />
+                              );
+                            }}
                           />
                         </div>
-                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Phone</label>
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "10px 10px" }}>
+                          <Field
+                            name="city"
+                            component={Autocomplete}
+                            options={allCities}
+                            style={{ width: "100%" }}
+                            getOptionLabel={(option) => option || ""}
+                            renderInput={(params) => {
+                              const inputProps = params.inputProps;
+                              inputProps.autoComplete = "disabled";
+                              return (
+                                <MuiTextField
+                                  {...params}
+                                  inputProps={inputProps}
+                                  name="city"
+                                  label="City"
+                                  required
+                                  variant="outlined"
+                                  fullWidth
+                                />
+                              );
+                            }}
+                          />
+                        </div>
+                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "10px 10px" }}>
                           <Field
                             type="text"
+                            component={TextField}
+                            name="address"
+                            multiline
+                            rows={3}
+                            autoComplete="disabled"
+                            label="Address"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "10px 10px" }}>
+                          <Field
+                            type="text"
+                            component={TextField}
                             name="phone"
-                            placeholder="Phone"
+                            autoComplete="disabled"
+                            label="Phone"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Whatsapp</label>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
                           <Field
                             type="text"
+                            component={TextField}
                             name="whatsapp"
-                            placeholder="WhatsApp"
+                            autoComplete="disabled"
+                            label="Whatsapp"
                             className="form-control form-control-lg"
                           />
                         </div>
@@ -257,7 +334,8 @@ function Suppliers({ toggle }) {
                   </Formik>
                 </div>
               </div>
-            </div>
+            </Backdrop>
+            {/* ...........list suppliers here.......... */}
             <table className="table table-striped">
               <thead className="thead-dark">
                 <tr>

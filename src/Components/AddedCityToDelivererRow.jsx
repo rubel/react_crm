@@ -23,8 +23,8 @@ function AddedCityToDelivererRow({
             defaultValue={selectedCity}>
             {allCities &&
               allCities.map((c, index) => (
-                <option key={index} value={c.city}>
-                  {c.city}
+                <option key={index} value={c}>
+                  {c}
                 </option>
               ))}
           </select>
@@ -33,7 +33,7 @@ function AddedCityToDelivererRow({
       <td>
         <div className="form-outline">
           <input
-            type="text"
+            type="number"
             name={"del_costs[" + index + "]"}
             id={"del_costs[" + index + "]"}
             placeholder={delivery_cost}
@@ -48,7 +48,7 @@ function AddedCityToDelivererRow({
       <td>
         <div className="form-outline">
           <input
-            type="text"
+            type="number"
             name={"return_costs[" + index + "]"}
             id={"return_costs[" + index + "]"}
             placeholder={return_cost}

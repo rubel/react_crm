@@ -1,7 +1,10 @@
+import MuiTextField from "@mui/material/TextField";
 import axios from "axios";
 import { Field, Form, Formik } from "formik";
+import { Autocomplete, TextField } from "formik-mui";
 import React, { useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
+import * as Yup from "yup";
 import CustomEditIcon from "../Components/CustomEditIcon";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
@@ -53,9 +56,11 @@ function Customers({ toggle }) {
       console.log(error);
     }
   }
-  async function addEditCustomer(values) {
+  async function addEditCustomer(values, resetFormFunc) {
     let funcName = "addNewCustomer";
     values.userId = JSON.parse(sessionStorage.getItem("fullUserDetails")).id;
+    values.city = values.city.city;
+    values.country = values.country.country;
 
     if (selectedCustomerId >= 0) {
       funcName = "editCustomerDetails";
@@ -69,6 +74,7 @@ function Customers({ toggle }) {
 
       if (res.data.includes("success")) {
         setSelectedCustomerId(-100);
+        resetFormFunc(getAddCustomerInitialValues());
         getAllCustomerList();
         updateAddCustomerFormVisibility();
       }
@@ -98,10 +104,10 @@ function Customers({ toggle }) {
           console.log(allCustomerList[i]);
           return {
             name: allCustomerList[i].name,
-            country: allCustomerList[i].country,
+            country: allCustomerList[i],
             phone: allCustomerList[i].phone,
             whatsapp: allCustomerList[i].whatsapp,
-            city: allCustomerList[i].city,
+            city: allCustomerList[i],
             address: allCustomerList[i].address,
           };
         }
@@ -137,6 +143,19 @@ function Customers({ toggle }) {
     getAllCountryList();
     getAllCities();
   }, []);
+
+  const phoneRegExp =
+    /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Required").min(3, "Minimum 3 chars").max(50, "Max 50 chars"),
+    phone: Yup.string().matches(phoneRegExp, "Phone number is not valid").required("Required"),
+    whatsapp: Yup.string().matches(phoneRegExp, "Whatsup number is not valid").required("Required"),
+    address: Yup.string()
+      .required("Required")
+      .min(10, "Minimum 10 chars")
+      .max(500, "Max 500 chars")
+      .required("Required"),
+  });
 
   var loggedIn = sessionStorage.getItem("uid");
 
@@ -186,74 +205,103 @@ function Customers({ toggle }) {
                   <Formik
                     initialValues={getAddCustomerInitialValues()}
                     enableReinitialize
-                    onSubmit={(values) => {
-                      addEditCustomer(values);
+                    validationSchema={validationSchema}
+                    onSubmit={(values, { resetForm }) => {
+                      addEditCustomer(values, resetForm);
                     }}>
                     <Form>
                       <div className="newCustomerForm">
                         {/*................title......................*/}
 
-                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Customer Name</label>
+                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "10px 10px" }}>
                           <Field
                             type="text"
+                            component={TextField}
                             name="name"
-                            placeholder="Customer Name"
+                            autoComplete="disabled"
+                            label="Customer Name"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Country: </label>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "20px 10px" }}>
                           <Field
-                            as="select"
                             name="country"
-                            className="select form-control-lg"
-                            style={{ width: "100%" }}>
-                            {allCountries &&
-                              allCountries.map((c, index) => (
-                                <option key={index} value={c.country}>
-                                  {c.country}
-                                </option>
-                              ))}
-                          </Field>
-                        </div>
-                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                          <label className="form-custom-label">City</label>
-                          <Field as="select" name="city" className="select form-control-lg" style={{ width: "100%" }}>
-                            {allCities &&
-                              allCities.map((c, index) => (
-                                <option key={index} value={c.id}>
-                                  {c.city}
-                                </option>
-                              ))}
-                          </Field>
-                        </div>
-                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Address: </label>
-                          <Field
-                            as="textarea"
-                            name="address"
-                            className="select form-control-lg"
+                            component={Autocomplete}
+                            options={allCountries}
                             style={{ width: "100%" }}
+                            getOptionLabel={(option) => option.country || ""}
+                            renderInput={(params) => {
+                              const inputProps = params.inputProps;
+                              inputProps.autoComplete = "disabled";
+                              return (
+                                <MuiTextField
+                                  {...params}
+                                  inputProps={inputProps}
+                                  name="country"
+                                  label="Country"
+                                  required
+                                  variant="outlined"
+                                  fullWidth
+                                />
+                              );
+                            }}
                           />
                         </div>
-                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Phone</label>
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "20px 10px" }}>
+                          <Field
+                            name="city"
+                            component={Autocomplete}
+                            options={allCities}
+                            style={{ width: "100%" }}
+                            getOptionLabel={(option) => option.city || ""}
+                            renderInput={(params) => {
+                              const inputProps = params.inputProps;
+                              inputProps.autoComplete = "disabled";
+                              return (
+                                <MuiTextField
+                                  {...params}
+                                  inputProps={inputProps}
+                                  name="city"
+                                  required
+                                  label="City"
+                                  variant="outlined"
+                                  fullWidth
+                                />
+                              );
+                            }}
+                          />
+                        </div>
+                        <div className="form-outline" style={{ width: "100%", float: "left", padding: "10px 10px" }}>
                           <Field
                             type="text"
+                            component={TextField}
+                            name="address"
+                            multiline
+                            rows={3}
+                            autoComplete="disabled"
+                            label="Address"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+                        <div className="form-outline" style={{ width: "50%", float: "right", padding: "10px 10px" }}>
+                          <Field
+                            type="text"
+                            component={TextField}
                             name="phone"
-                            placeholder="Phone"
+                            autoComplete="disabled"
+                            label="Phone"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "0px 10px" }}>
-                          <label className="form-custom-label">Whatsapp</label>
+                        <div className="form-outline" style={{ width: "50%", float: "left", padding: "10px 10px" }}>
                           <Field
                             type="text"
+                            autoComplete="disabled"
+                            component={TextField}
                             name="whatsapp"
-                            placeholder="WhatsApp"
+                            label="WhatsApp"
                             className="form-control form-control-lg"
                           />
                         </div>

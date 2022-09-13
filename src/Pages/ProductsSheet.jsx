@@ -1,5 +1,7 @@
+import { Backdrop } from "@mui/material";
 import axios from "axios";
 import { Field, Form, Formik } from "formik";
+import { TextField } from "formik-mui";
 import React, { useEffect, useState } from "react";
 import { BiPlus, BiSearch } from "react-icons/bi";
 import ProductSheet from "../Components/ProductSheet";
@@ -132,7 +134,9 @@ export default function ProductsSheet({ toggle }) {
 
           <div className="container-fluid">
             {/*....delete conformation.....*/}
-            <div className="fullShadow" style={deleteConformationVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={deleteConformationVisible}>
               <div className="deleteConformationBg">
                 <div>
                   <h4>Warning</h4>
@@ -158,9 +162,11 @@ export default function ProductsSheet({ toggle }) {
                   </button>
                 </div>
               </div>
-            </div>
+            </Backdrop>
             {/*....add product.....*/}
-            <div className="fullShadow" style={addProductFormVisible ? { display: "flex" } : { display: "none" }}>
+            <Backdrop
+              sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, overflowY: "scroll" }}
+              open={addProductFormVisible}>
               <div className="productSheetFormBg">
                 <div style={{ padding: "0px 10px" }}>
                   <div style={{ marginBottom: "18px" }}>
@@ -178,112 +184,136 @@ export default function ProductsSheet({ toggle }) {
                       <div className="newProductForm">
                         {/*................title......................*/}
 
-                        <div className="form-outline" style={{ padding: "0px 10px", float: "left", width: "50%" }}>
-                          <label className="form-custom-label">Name</label>
-                          <Field type="text" name="name" placeholder="Name" className="form-control form-control-lg" />
-                        </div>
-
-                        <div className="form-outline" style={{ padding: "0px 10px", float: "right", width: "50%" }}>
-                          <label className="form-custom-label">Website</label>
+                        <div className="form-outline" style={{ padding: "10px 10px", float: "left", width: "50%" }}>
                           <Field
                             type="text"
+                            component={TextField}
+                            name="name"
+                            autoComplete="disabled"
+                            label="Name"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ padding: "10px 10px", float: "right", width: "50%" }}>
+                          <Field
+                            type="text"
+                            component={TextField}
                             name="website"
-                            placeholder="http://"
+                            autoComplete="disabled"
+                            label="Website"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ padding: "0px 10px", float: "left", width: "50%" }}>
-                          <label className="form-custom-label">Facebook</label>
+                        <div className="form-outline" style={{ padding: "10px 10px", float: "left", width: "50%" }}>
                           <Field
                             type="text"
+                            component={TextField}
                             name="facebook"
-                            placeholder="http://"
+                            autoComplete="disabled"
+                            label="Facebook"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ padding: "0px 10px", float: "right", width: "50%" }}>
-                          <label className="form-custom-label">Video URL</label>
+                        <div className="form-outline" style={{ padding: "10px 10px", float: "right", width: "50%" }}>
                           <Field
                             type="text"
+                            component={TextField}
                             name="video_url"
-                            placeholder="http://"
+                            autoComplete="disabled"
+                            label="Video URL"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ padding: "0px 10px", float: "left", width: "50%" }}>
-                          <label className="form-custom-label">Final Video URL</label>
+                        <div className="form-outline" style={{ padding: "10px 10px", float: "left", width: "50%" }}>
                           <Field
                             type="text"
+                            component={TextField}
                             name="final_video_url"
-                            placeholder="http://"
+                            autoComplete="disabled"
+                            label="Final Video URL"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ padding: "0px 10px", float: "right", width: "50%" }}>
-                          <label className="form-custom-label">Ad Copy</label>
+                        <div className="form-outline" style={{ padding: "10px 10px", float: "right", width: "50%" }}>
                           <Field
                             type="text"
+                            component={TextField}
                             name="ad_copy"
-                            placeholder="http://"
+                            autoComplete="disabled"
+                            label="Ad Copy"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ padding: "0px 10px", float: "left", width: "50%" }}>
-                          <label className="form-custom-label">Price</label>
-                          <Field type="number" name="price" placeholder="0" className="form-control form-control-lg" />
-                        </div>
-
-                        <div className="form-outline" style={{ padding: "0px 10px", float: "right", width: "50%" }}>
-                          <label className="form-custom-label">Compare Price</label>
+                        <div className="form-outline" style={{ padding: "10px 10px", float: "left", width: "50%" }}>
                           <Field
                             type="number"
+                            component={TextField}
+                            name="price"
+                            autoComplete="disabled"
+                            label="Price"
+                            className="form-control form-control-lg"
+                          />
+                        </div>
+
+                        <div className="form-outline" style={{ padding: "10px 10px", float: "right", width: "50%" }}>
+                          <Field
+                            type="number"
+                            component={TextField}
                             name="compare_price"
-                            placeholder="0"
+                            autoComplete="disabled"
+                            label="Compare Price"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ padding: "0px 10px", float: "left", width: "50%" }}>
-                          <label className="form-custom-label">Voice over audio</label>
+                        <div className="form-outline" style={{ padding: "10px 10px", float: "left", width: "50%" }}>
                           <Field
                             type="text"
+                            component={TextField}
                             name="voice_over_audio"
-                            placeholder="http://"
+                            autoComplete="disabled"
+                            label="Voice over audio"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ padding: "0px 10px", float: "right", width: "50%" }}>
-                          <label className="form-custom-label">Voice over text</label>
+                        <div className="form-outline" style={{ padding: "10px 10px", float: "right", width: "50%" }}>
                           <Field
                             type="text"
+                            component={TextField}
                             name="voice_over_text"
-                            placeholder="http://"
+                            autoComplete="disabled"
+                            label="Voice over text"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ padding: "0px 10px" }}>
-                          <label className="form-custom-label">Photo and Video</label>
+                        <div className="form-outline" style={{ padding: "10px 10px" }}>
                           <Field
                             type="text"
+                            component={TextField}
                             name="photo_and_video"
-                            placeholder="http://"
+                            autoComplete="disabled"
+                            label="Photo And Video"
                             className="form-control form-control-lg"
                           />
                         </div>
 
-                        <div className="form-outline" style={{ padding: "0px 10px" }}>
-                          <label className="form-custom-label">Description</label>
+                        <div className="form-outline" style={{ padding: "10px 10px" }}>
                           <Field
-                            as="textarea"
+                            type="text"
+                            component={TextField}
                             name="description"
-                            placeholder="Description"
+                            autoComplete="disabled"
+                            multiline
+                            rows={3}
+                            label="Description"
                             className="form-control form-control-lg"
                           />
                         </div>
@@ -312,7 +342,7 @@ export default function ProductsSheet({ toggle }) {
                   </Formik>
                 </div>
               </div>
-            </div>
+            </Backdrop>
 
             <div>
               {" "}
