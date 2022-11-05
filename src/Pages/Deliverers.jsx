@@ -8,6 +8,7 @@ import { BiPhone, BiSearch, BiUser } from "react-icons/bi";
 import * as Yup from "yup";
 import AddedCityToDelivererRow from "../Components/AddedCityToDelivererRow";
 import CustomEditIcon from "../Components/CustomEditIcon";
+import { SERVER_URL } from "../Constants/AppConstants";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied";
@@ -29,7 +30,7 @@ function Deliverers({ toggle, type }) {
   });
   async function getAllDelivererList(searchTerm = "") {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: type == "company" ? "getAllDeliverCompanies" : "getAllDeliverers",
         searchTerm: searchTerm,
       });
@@ -77,7 +78,7 @@ function Deliverers({ toggle, type }) {
   };
   async function getAllCities() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllCities",
       });
 
@@ -95,7 +96,7 @@ function Deliverers({ toggle, type }) {
   async function addNewCity(values) {
     values.userId = JSON.parse(sessionStorage.getItem("fullUserDetails")).id;
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "addNewCity",
         formData: JSON.stringify(values),
       });
@@ -111,7 +112,7 @@ function Deliverers({ toggle, type }) {
   }
   async function getAllCountryList() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllCountries",
       });
 
@@ -136,7 +137,7 @@ function Deliverers({ toggle, type }) {
     }
 
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: funcName,
         formData: JSON.stringify(values),
       });
@@ -171,7 +172,7 @@ function Deliverers({ toggle, type }) {
     }
 
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: funcName,
         formData: JSON.stringify(values),
       });
@@ -196,7 +197,7 @@ function Deliverers({ toggle, type }) {
   }
   async function deleteSelectedDeliverer() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "deleteSelectedDeliverer",
         deliverer_id: selectedDelivererId,
       });
@@ -216,7 +217,7 @@ function Deliverers({ toggle, type }) {
     stateCopy.creatorId = JSON.parse(sessionStorage.getItem("fullUserDetails")).id;
 
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "saveAddedCityValuesForDeliverers",
         formData: JSON.stringify(stateCopy),
       });
@@ -337,7 +338,7 @@ function Deliverers({ toggle, type }) {
   }
   async function citiesButtonPressed(id) {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllAssignedCitiesForDeliverer",
         delivererId: id,
       });

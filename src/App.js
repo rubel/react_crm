@@ -2,8 +2,10 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./Components/Login";
+import { headers, SERVER_URL } from "./Constants/AppConstants";
 import SideBar from "./MainApp/SideBar";
 import AddUser from "./Pages/AddUser";
+import Affiliate from "./Pages/Affiliate";
 import Customers from "./Pages/Customers";
 import Dashboard from "./Pages/Dashboard";
 import Deliverers from "./Pages/Deliverers";
@@ -57,10 +59,16 @@ function App() {
   useEffect(() => {
     const getAllPermissions = async () => {
       try {
-        const res = await axios.post("http://localhost:80/crm/service.php", {
-          func: "getAllPermissions",
-        });
-
+        const res = await axios.post(
+          SERVER_URL + "crm/service.php",
+          {
+            func: "getAllPermissions",
+          },
+          {
+            headers: headers,
+          }
+        );
+        console.log(res.data);
         if (res.data) {
           let resData = JSON.stringify(res.data);
           sessionStorage.setItem("ALL_PERMISSIONS", resData);
@@ -72,6 +80,12 @@ function App() {
 
     if (!sessionStorage.getItem("ALL_PERMISSIONS")) {
       getAllPermissions().catch(console.error);
+    } else {
+      try {
+        JSON.parse(sessionStorage.getItem("ALL_PERMISSIONS"));
+      } catch (error) {
+        getAllPermissions().catch(console.error);
+      }
     }
   }, []);
 
@@ -90,6 +104,7 @@ function App() {
               }
             />
             <Route path="/dashboard" element={<Dashboard toggle={toggle} />} />
+            <Route path="/affiliate" element={<Affiliate toggle={toggle} />} />
             <Route path="/users" element={<Users type="all" toggle={toggle} />} />
             <Route path="/agents" element={<Users type="agent" toggle={toggle} />} />
             <Route path="/orders" element={<Orders toggle={toggle} />} />

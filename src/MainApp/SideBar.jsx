@@ -91,6 +91,11 @@ const routes = [
     name: "Products Sheet",
     icon: <FaDatabase />,
   },
+  {
+    path: "/affiliate",
+    name: "Affiliate",
+    icon: <FaDatabase />,
+  },
   // {
   //   path: "/messaging",
   //   name: "Messaging",

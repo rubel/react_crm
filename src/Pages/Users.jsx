@@ -15,6 +15,7 @@ import { SERVER_URL } from "../Constants/AppConstants";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied";
+
 export default function Users({ toggle, type }) {
   const [allUsers, setAllUsers] = useState([]);
   const [allOrdersOfTheAgent, setAllOrdersOfTheAgent] = useState([]);
@@ -321,9 +322,10 @@ export default function Users({ toggle, type }) {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart width={500} height={40} data={statusCounts}>
                       <Bar dataKey="orders">
-                        {statusCounts.map((entry, index) => (
-                          <Cell cursor="pointer" fill={"#82ca9d"} key={`cell-${index}`} />
-                        ))}
+                        {statusCounts &&
+                          statusCounts.map((entry, index) => (
+                            <Cell cursor="pointer" fill={"#82ca9d"} key={`cell-${index}`} />
+                          ))}
                       </Bar>
                       <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                       <YAxis />

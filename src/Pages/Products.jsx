@@ -6,6 +6,7 @@ import { Autocomplete, TextField } from "formik-mui";
 import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 import CustomEditIcon from "../Components/CustomEditIcon";
+import { SERVER_URL } from "../Constants/AppConstants";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied";
@@ -21,7 +22,7 @@ export default function Products({ toggle }) {
 
   async function getAllProductList() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllProducts",
       });
 
@@ -34,7 +35,7 @@ export default function Products({ toggle }) {
   }
   async function getAllCategories() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllCategories",
       });
 
@@ -60,7 +61,7 @@ export default function Products({ toggle }) {
       values.id = productIdGoingTobeEdited;
     }
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: funcName,
         formData: JSON.stringify(values),
       });
@@ -77,7 +78,7 @@ export default function Products({ toggle }) {
   async function addNewCategory(values) {
     values.userId = JSON.parse(sessionStorage.getItem("fullUserDetails")).id;
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "addNewCategory",
         formData: JSON.stringify(values),
       });
@@ -107,7 +108,7 @@ export default function Products({ toggle }) {
   }
   async function deleteSelectedProduct() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "deleteSelectedProduct",
         pid: productIdGoingTobeDeleted,
       });

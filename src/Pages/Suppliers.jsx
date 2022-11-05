@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
 import * as Yup from "yup";
 import CustomEditIcon from "../Components/CustomEditIcon";
+import { SERVER_URL } from "../Constants/AppConstants";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied";
@@ -21,7 +22,7 @@ function Suppliers({ toggle }) {
 
   async function getAllSupplierList(searchTerm = "") {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllSuppliers",
         searchTerm: searchTerm,
       });
@@ -34,7 +35,7 @@ function Suppliers({ toggle }) {
   }
   async function getAllCities() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllCities",
       });
 
@@ -48,7 +49,7 @@ function Suppliers({ toggle }) {
   }
   async function getAllCountryList() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllCountries",
       });
 
@@ -70,7 +71,7 @@ function Suppliers({ toggle }) {
       values.id = selectedSupplierId;
     }
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: funcName,
         formData: JSON.stringify(values),
       });
@@ -87,7 +88,7 @@ function Suppliers({ toggle }) {
   }
   async function deleteSelectedSupplier() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "deleteSelectedSupplier",
         sid: selectedSupplierId,
       });

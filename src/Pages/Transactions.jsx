@@ -8,6 +8,7 @@ import { BiSearch } from "react-icons/bi";
 import { TiWarning } from "react-icons/ti";
 import AddTransactionTabs from "../Components/AddTransactionTabs";
 import TransactionsDottedIcon from "../Components/TransactionsDottedIcon";
+import { SERVER_URL } from "../Constants/AppConstants";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied";
@@ -32,7 +33,7 @@ function Transactions({ toggle }) {
   }
   async function getAllTransactions(searchTerm = "") {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllTransactions",
         searchTerm: searchTerm,
       });
@@ -46,7 +47,7 @@ function Transactions({ toggle }) {
   }
   async function getAllWarehouseList() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllWarehouse",
         searchKey: "",
       });
@@ -64,7 +65,7 @@ function Transactions({ toggle }) {
   }
   async function getAllSupplierList() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllSuppliers",
         searchTerm: "",
       });

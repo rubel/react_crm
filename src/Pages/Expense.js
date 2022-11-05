@@ -6,6 +6,7 @@ import { Autocomplete, TextField } from "formik-mui";
 import React, { useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
 import CustomEditIcon from "../Components/CustomEditIcon";
+import { SERVER_URL } from "../Constants/AppConstants";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied";
@@ -21,7 +22,7 @@ export default function Expense({ toggle, type }) {
 
   async function getAllExpenceSheet(searchTerm = "") {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllExpenceSheets",
         searchKey: searchTerm,
         type: type,
@@ -37,7 +38,7 @@ export default function Expense({ toggle, type }) {
 
   async function getAllUsers(searchTerm = "") {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllUsers",
         searchTerm: searchTerm,
         type: "",
@@ -53,7 +54,7 @@ export default function Expense({ toggle, type }) {
   }
   async function getAllExpenceCategories() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllExpenceCategories",
       });
 
@@ -83,7 +84,7 @@ export default function Expense({ toggle, type }) {
     }
 
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: funcName,
         formData: JSON.stringify(values),
       });
@@ -100,7 +101,7 @@ export default function Expense({ toggle, type }) {
   async function addNewExpenceCategory(values, resetFormFunc) {
     values.userId = JSON.parse(sessionStorage.getItem("fullUserDetails")).id;
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "addNewExpenceCategory",
         formData: JSON.stringify(values),
       });
@@ -117,7 +118,7 @@ export default function Expense({ toggle, type }) {
   }
   async function deleteSelectedExpence() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "deleteSelectedExpenceSheet",
         id: selectedExpenceId,
       });

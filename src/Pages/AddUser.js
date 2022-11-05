@@ -3,6 +3,7 @@ import { Field, Form, Formik } from "formik";
 import { default as React } from "react";
 import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import "../App.css";
+import { SERVER_URL } from "../Constants/AppConstants";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 
@@ -23,7 +24,7 @@ export default class AddUser extends React.Component {
     console.log(formData);
     console.log(JSON.stringify(formData));
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "registerUser",
         formData: JSON.stringify(formData),
       });

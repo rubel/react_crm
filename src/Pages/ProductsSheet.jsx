@@ -5,6 +5,7 @@ import { TextField } from "formik-mui";
 import React, { useEffect, useState } from "react";
 import { BiPlus, BiSearch } from "react-icons/bi";
 import ProductSheet from "../Components/ProductSheet";
+import { SERVER_URL } from "../Constants/AppConstants";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied";
@@ -17,7 +18,7 @@ export default function ProductsSheet({ toggle }) {
 
   async function getAllProductSheet(searchTerm = "") {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllProductSheets",
         searchKey: searchTerm,
       });
@@ -41,7 +42,7 @@ export default function ProductsSheet({ toggle }) {
     }
 
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: funcName,
         formData: JSON.stringify(values),
       });
@@ -57,7 +58,7 @@ export default function ProductsSheet({ toggle }) {
   }
   async function deleteSelectedProduct() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "deleteSelectedProductSheet",
         id: selectedProductId,
       });

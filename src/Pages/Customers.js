@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
 import * as Yup from "yup";
 import CustomEditIcon from "../Components/CustomEditIcon";
+import { SERVER_URL } from "../Constants/AppConstants";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied";
@@ -19,7 +20,7 @@ function Customers({ toggle }) {
   const [selectedCustomerId, setSelectedCustomerId] = useState(-100);
   async function getAllCustomerList(searchTerm = "") {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllCustomers",
         searchTerm: searchTerm,
       });
@@ -32,7 +33,7 @@ function Customers({ toggle }) {
   }
   async function getAllCountryList() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllCountries",
       });
 
@@ -45,7 +46,7 @@ function Customers({ toggle }) {
   }
   async function getAllCities() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllCities",
       });
 
@@ -67,7 +68,7 @@ function Customers({ toggle }) {
       values.id = selectedCustomerId;
     }
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: funcName,
         formData: JSON.stringify(values),
       });
@@ -84,7 +85,7 @@ function Customers({ toggle }) {
   }
   async function deleteSelectedCustomer() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "deleteSelectedCustomer",
         cid: selectedCustomerId,
       });

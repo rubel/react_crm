@@ -8,6 +8,7 @@ import { AiOutlineReload } from "react-icons/ai";
 import { FaSearch } from "react-icons/fa";
 import * as Yup from "yup";
 import WarehouseBlock from "../Components/WarehouseBlock";
+import { SERVER_URL } from "../Constants/AppConstants";
 import Tabs from "../MainApp/Tabs";
 import TopBar from "../MainApp/TopBar";
 import AccessDenied from "./AccessDenied";
@@ -23,7 +24,7 @@ export default function Warehouses({ toggle }) {
 
   async function getAllWarehouseList(searchKey = "") {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllWarehouse",
         searchKey: searchKey,
       });
@@ -37,7 +38,7 @@ export default function Warehouses({ toggle }) {
   }
   async function getAllCities() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "getAllCities",
       });
 
@@ -52,7 +53,7 @@ export default function Warehouses({ toggle }) {
   async function addNewCity(values, resetFormFunc) {
     values.userId = JSON.parse(sessionStorage.getItem("fullUserDetails")).id;
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "addNewCity",
         formData: JSON.stringify(values),
       });
@@ -85,7 +86,7 @@ export default function Warehouses({ toggle }) {
       values.id = selectedWarehouseId;
     }
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: funcName,
         formData: JSON.stringify(values),
       });
@@ -103,7 +104,7 @@ export default function Warehouses({ toggle }) {
 
   async function deleteSelectedWarehouse() {
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
+      const res = await axios.post(SERVER_URL + "crm/service.php", {
         func: "deleteSelectedWarehouse",
         pid: selectedWarehouseId,
       });

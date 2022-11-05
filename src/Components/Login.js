@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import { headers, SERVER_URL } from "../Constants/AppConstants";
 
 export default function Login({ toggle }) {
   const [uid, setUid] = useState("");
@@ -15,11 +16,17 @@ export default function Login({ toggle }) {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:80/crm/service.php", {
-        uid: uid,
-        password: password,
-        func: "login",
-      });
+      const res = await axios.post(
+        SERVER_URL + "crm/service.php",
+        {
+          uid: uid,
+          password: password,
+          func: "login",
+        },
+        {
+          headers: headers,
+        }
+      );
 
       if (res.data == "login_failed") {
         setMsg("Wrong Userid/password");
